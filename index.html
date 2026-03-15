@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>汉记 Hanji</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --red:#c8392b;--red-d:#a02d21;--red-l:#fdf0ee;--red-g:rgba(200,57,43,.15);
+  --gold:#c9920a;--gold-l:#fef8e7;--jade:#2a7a50;--jade-l:#eaf5f0;
+  --blue:#1a6fb5;--blue-l:#e8f2fb;--purple:#6d28d9;--purple-l:#ede9fe;
+  --ink:#1a1208;--ink7:#3d2e18;--ink5:#6b5535;--ink3:#a8906b;
+  --ink15:#ddd0b8;--ink07:#f0ebe0;--cream:#faf7f2;--white:#fff;
+  --sh:0 2px 8px rgba(26,18,8,.08);--sh-m:0 4px 20px rgba(26,18,8,.12);
+  --sh-l:0 12px 48px rgba(26,18,8,.18);--r:14px;--rs:8px;--rl:20px;
+  --nav:58px;--bot:64px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;padding-bottom:var(--bot);}
+.fc{font-family:'Noto Serif SC',serif;}
+.fd{font-family:'Playfair Display',serif;}
+.page{display:none;min-height:100vh;padding-top:var(--nav);}
+.page.active{display:block;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--ink15);border-radius:2px;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 22px;border-radius:var(--rs);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;white-space:nowrap;-webkit-user-select:none;user-select:none;}
+.btn:active{transform:scale(.96);}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
+.btn-r{background:var(--red);color:#fff;box-shadow:0 4px 12px var(--red-g);}
+.btn-r:hover:not(:disabled){background:var(--red-d);}
+.btn-o{background:transparent;color:var(--ink);border:1.5px solid var(--ink15);}
+.btn-o:hover{background:var(--ink07);}
+.btn-g{background:transparent;color:var(--ink5);}
+.btn-g:hover{background:var(--ink07);color:var(--ink);}
+.btn-gold{background:var(--gold);color:#fff;}
+.btn-jade{background:var(--jade);color:#fff;}
+.btn-lg{padding:15px 32px;font-size:16px;border-radius:12px;}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:6px;}
+.btn-full{width:100%;}
+/* INPUTS */
+.inp{width:100%;padding:13px 16px;border:1.5px solid var(--ink15);border-radius:var(--rs);background:var(--white);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;}
+.inp:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-g);}
+.inp::placeholder{color:var(--ink3);}
+.inp:disabled{background:var(--ink07);color:var(--ink5);cursor:not-allowed;}
+.lbl{display:block;font-size:12px;font-weight:600;color:var(--ink5);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;}
+.fg{margin-bottom:15px;}
+.fg-hint{font-size:11px;color:var(--ink3);margin-top:4px;}
+/* CARDS */
+.card{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);box-shadow:var(--sh);}
+/* PILL */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+.pill-r{background:var(--red-l);color:var(--red);}
+.pill-g{background:var(--gold-l);color:var(--gold);}
+.pill-j{background:var(--jade-l);color:var(--jade);}
+.pill-k{background:var(--ink07);color:var(--ink5);}
+.pill-b{background:var(--blue-l);color:var(--blue);}
+/* ALERTS */
+.alert{padding:11px 15px;border-radius:var(--rs);font-size:14px;margin-bottom:14px;animation:fadeUp .25s ease;}
+.alert-e{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;}
+.alert-s{background:var(--jade-l);border:1px solid #bbf7d0;color:#15803d;}
+.alert-i{background:var(--blue-l);border:1px solid #bfdbfe;color:var(--blue);}
+/* SPINNER */
+.spin{display:inline-block;width:17px;height:17px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+.spin-d{border:2.5px solid var(--ink15);border-top-color:var(--red);}
+/* PROGRESS BAR */
+.pbar{height:8px;background:var(--ink07);border-radius:100px;overflow:hidden;}
+.pfill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--red),#e85d4a);transition:width .9s cubic-bezier(.4,0,.2,1);}
+.pfill-g{background:linear-gradient(90deg,var(--jade),#38a169);}
+.pfill-gold{background:linear-gradient(90deg,var(--gold),#f0b429);}
+/* ANIMATIONS */
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes bounceIn{from{opacity:0;transform:scale(.82);}60%{transform:scale(1.04);}to{opacity:1;transform:scale(1);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-5px);}40%,80%{transform:translateX(5px);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes confettiDrop{0%{opacity:1;transform:translateY(-20px) rotate(0deg);}100%{opacity:0;transform:translateY(100px) rotate(360deg);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes heartbeat{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+/* CONFETTI */
+.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;}
+.confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:confettiDrop 1.5s ease-in forwards;}
+/* ============================================================ NAVIGATION ============================================================ */
+#nav{position:fixed;top:0;left:0;right:0;z-index:500;height:var(--nav);background:rgba(250,247,242,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--ink15);display:flex;align-items:center;padding:0 18px;gap:12px;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:9px;cursor:pointer;}
+.nlc{font-family:'Noto Serif SC',serif;font-size:22px;color:var(--red);font-weight:700;}
+.nlt{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--ink);}
+.nav-r{display:flex;align-items:center;gap:10px;}
+.nav-streak{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:700;color:var(--red);cursor:pointer;}
+.nav-av{width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:14px;font-weight:700;cursor:pointer;overflow:hidden;border:2px solid var(--red-l);}
+.nav-av img{width:100%;height:100%;object-fit:cover;}
+/* ============================================================ BOTTOM NAV ============================================================ */
+#bot-nav{position:fixed;bottom:0;left:0;right:0;z-index:500;height:var(--bot);background:rgba(250,247,242,.96);backdrop-filter:blur(20px);border-top:1px solid var(--ink15);display:flex;align-items:stretch;justify-content:space-around;padding:0;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--ink3);transition:all .15s;padding:8px 4px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.bn:active{transform:scale(.9);background:var(--ink07);}
+.bn.act{color:var(--red);}
+.bn-ico{font-size:22px;line-height:1;}
+.bn-lbl{font-size:10px;font-weight:600;font-family:'DM Sans',sans-serif;letter-spacing:.02em;}
+/* ============================================================ OVERLAY / MODAL ============================================================ */
+.overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(26,18,8,.76);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;-webkit-overflow-scrolling:touch;}
+.overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:var(--rl);width:100%;max-width:400px;padding:34px 28px;box-shadow:var(--sh-l);animation:bounceIn .32s cubic-bezier(.34,1.56,.64,1);position:relative;max-height:90vh;overflow-y:auto;}
+.mx{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;border:none;background:var(--ink07);color:var(--ink5);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mx:hover{background:var(--ink15);}
+.mlogo{text-align:center;margin-bottom:20px;}
+.mlogo-c{font-family:'Noto Serif SC',serif;font-size:32px;color:var(--red);display:block;}
+.mlogo-t{font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);}
+.mtitle{font-family:'Playfair Display',serif;font-size:24px;color:var(--ink);text-align:center;margin-bottom:3px;}
+.msub{font-size:13px;color:var(--ink5);text-align:center;margin-bottom:20px;}
+.tab-row{display:flex;background:var(--ink07);border-radius:var(--rs);padding:3px;margin-bottom:18px;}
+.tab-b{flex:1;padding:9px;border-radius:6px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--ink5);cursor:pointer;transition:all .18s;}
+.tab-b.act{background:var(--white);color:var(--ink);box-shadow:var(--sh);}
+/* ============================================================ TOAST ============================================================ */
+#toast{position:fixed;bottom:calc(var(--bot) + 14px);left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;padding:13px 20px;border-radius:12px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;box-shadow:var(--sh-l);max-width:320px;width:90%;opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:9px;text-align:center;justify-content:center;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+#toast.success{background:var(--jade);color:#fff;}
+#toast.error{background:#dc2626;color:#fff;}
+#toast.info{background:var(--ink);color:#fff;}
+#toast.gold{background:var(--gold);color:#fff;}
+/* ============================================================ PSYCHOLOGY BANNERS ============================================================ */
+.psych-banner{background:linear-gradient(135deg,var(--red-d),var(--red));border-radius:var(--r);padding:16px 20px;margin-bottom:18px;display:flex;align-items:center;gap:14px;color:#fff;animation:slideUp .4s ease;}
+.psych-banner.jade{background:linear-gradient(135deg,#1a5c3a,var(--jade));}
+.psych-banner.gold{background:linear-gradient(135deg,#8a6500,var(--gold));}
+.psych-banner.purple{background:linear-gradient(135deg,#3b1f7a,var(--purple));}
+.pb-icon{font-size:32px;flex-shrink:0;}
+.pb-title{font-size:15px;font-weight:700;margin-bottom:3px;}
+.pb-sub{font-size:12px;opacity:.8;line-height:1.5;}
+.pb-action{margin-left:auto;flex-shrink:0;}
+/* Streak shield popup */
+.streak-popup{position:fixed;bottom:calc(var(--bot)+20px);left:16px;right:16px;z-index:800;background:linear-gradient(135deg,var(--red-d),var(--red));border-radius:var(--r);padding:16px 18px;color:#fff;box-shadow:var(--sh-l);display:none;animation:slideUp .4s ease;}
+.streak-popup.show{display:flex;align-items:center;gap:12px;}
+.sp-close{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);font-size:18px;cursor:pointer;padding:4px;}
+/* ============================================================ LANDING ============================================================ */
+#landing{padding-top:0!important;background:var(--cream);}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 40px;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;font-family:'Noto Serif SC',serif;font-size:200px;color:var(--ink);opacity:.03;display:flex;align-items:center;justify-content:center;pointer-events:none;font-weight:900;}
+.htag{display:inline-flex;align-items:center;gap:7px;background:var(--red-l);border:1px solid #fecdd3;color:var(--red);padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:24px;animation:fadeUp .5s ease both;}
+.hdot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 2s infinite;}
+.htitle{font-family:'Playfair Display',serif;font-size:clamp(34px,7vw,62px);font-weight:700;line-height:1.1;color:var(--ink);margin-bottom:16px;animation:fadeUp .5s .1s ease both;}
+.htitle em{font-style:italic;color:var(--red);}
+.hsub{font-size:17px;color:var(--ink5);line-height:1.7;max-width:440px;margin:0 auto 36px;animation:fadeUp .5s .2s ease both;}
+.hbtns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .5s .3s ease both;}
+.how-sec{background:var(--ink);padding:80px 24px;}
+.how-in{max-width:1000px;margin:0 auto;}
+.sec-tag{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:12px;}
+.sec-t{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,40px);line-height:1.15;margin-bottom:36px;}
+.steps-g{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.step-c{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);padding:26px 20px;}
+.step-n{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;color:rgba(255,255,255,.1);line-height:1;margin-bottom:14px;}
+.step-i{font-size:28px;margin-bottom:10px;display:block;}
+.step-t{font-size:17px;font-weight:700;color:var(--white);margin-bottom:6px;}
+.step-d{font-size:13px;color:rgba(255,255,255,.45);line-height:1.7;}
+.price-sec{padding:80px 24px;background:var(--ink07);}
+.price-in{max-width:700px;margin:0 auto;text-align:center;}
+.price-g{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px;text-align:left;}
+.price-c{background:var(--white);border:1px solid var(--ink15);border-radius:var(--rl);padding:28px;position:relative;overflow:hidden;}
+.price-c.feat{border-color:var(--red);box-shadow:0 0 0 3px var(--red-l),var(--sh-l);}
+.price-badge{position:absolute;top:14px;right:14px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;text-transform:uppercase;letter-spacing:.06em;}
+.price-name{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink5);margin-bottom:10px;}
+.price-amt{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px;}
+.price-amt span{font-size:15px;color:var(--ink3);font-family:'DM Sans',sans-serif;}
+.price-desc{font-size:13px;color:var(--ink5);margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--ink07);}
+.pf-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.pf-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink);}
+.pfy{color:var(--jade);}
+.pfn{color:var(--ink3);}
+.land-footer{background:var(--ink);color:rgba(255,255,255,.35);padding:32px 24px;text-align:center;font-size:13px;}
+/* ============================================================ ONBOARDING ============================================================ */
+#onboarding{background:var(--cream);}
+.ob-w{max-width:540px;margin:0 auto;padding:40px 20px;}
+.ob-prog{display:flex;gap:7px;margin-bottom:44px;}
+.ob-pip{height:4px;flex:1;border-radius:100px;background:var(--ink15);transition:background .3s;}
+.ob-pip.done{background:var(--red);}
+.ob-step{display:none;}
+.ob-step.active{display:block;animation:fadeUp .38s ease;}
+.ob-title{font-family:'Playfair Display',serif;font-size:32px;color:var(--ink);margin-bottom:7px;}
+.ob-sub{font-size:15px;color:var(--ink5);margin-bottom:28px;line-height:1.65;}
+.ch-grid{display:flex;flex-direction:column;gap:11px;margin-bottom:26px;}
+.ch-c{padding:17px 19px;border-radius:var(--r);border:2px solid var(--ink15);background:var(--white);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:13px;}
+.ch-c:hover,.ch-c.sel{border-color:var(--red);background:var(--red-l);}
+.ch-ico{font-size:24px;}
+.ch-t{font-size:15px;font-weight:700;color:var(--ink);}
+.ch-d{font-size:12px;color:var(--ink5);margin-top:2px;}
+.goal-row{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:26px;}
+.goal-b{width:54px;height:54px;border-radius:10px;border:1.5px solid var(--ink15);background:var(--white);font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--ink5);cursor:pointer;transition:all .15s;}
+.goal-b:hover,.goal-b.sel{border-color:var(--red);}
+.goal-b.sel{background:var(--red);color:#fff;}
+/* Placement test */
+.pt-card{background:var(--white);border:1px solid var(--ink15);border-radius:var(--rl);padding:28px;box-shadow:var(--sh-m);}
+.pt-num{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:7px;}
+.pt-q{font-size:18px;color:var(--ink);margin-bottom:20px;line-height:1.5;}
+.pt-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.pt-opt{padding:12px 15px;border-radius:9px;border:1.5px solid var(--ink15);background:var(--white);font-size:14px;color:var(--ink);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;text-align:left;touch-action:manipulation;}
+.pt-opt:active{transform:scale(.97);}
+.pt-opt.correct{border-color:var(--jade)!important;background:var(--jade-l)!important;color:var(--jade)!important;font-weight:700;}
+.pt-opt.wrong{border-color:#dc2626!important;background:#fef2f2!important;color:#dc2626!important;}
+.pt-opt:disabled{cursor:default;}
+/* ============================================================ DASHBOARD ============================================================ */
+#dashboard{background:var(--cream);}
+.dash-w{max-width:900px;margin:0 auto;padding:26px 16px;}
+.dash-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:12px;flex-wrap:wrap;}
+.dash-greet{font-family:'Playfair Display',serif;font-size:26px;color:var(--ink);}
+.dash-greet em{font-style:italic;color:var(--red);}
+.dash-date{font-size:12px;color:var(--ink3);margin-top:3px;}
+/* Streak bar */
+.str-bar{background:var(--ink);border-radius:var(--rl);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;cursor:pointer;transition:transform .15s;}
+.str-bar:active{transform:scale(.99);}
+.str-l{display:flex;align-items:center;gap:14px;}
+.str-fire{font-size:38px;line-height:1;animation:heartbeat 2s ease-in-out infinite;}
+.str-num{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;color:#ff6b35;line-height:1;}
+.str-lbl{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.str-r{display:flex;gap:22px;}
+.ssv{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;}
+.ssl{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.05em;}
+/* Stats */
+.stats-g{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px;}
+.stat-b{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:16px;}
+.stat-ico{font-size:20px;margin-bottom:8px;}
+.stat-v{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--ink);line-height:1;}
+.stat-l{font-size:10px;color:var(--ink3);margin-top:3px;text-transform:uppercase;letter-spacing:.04em;}
+/* Goal */
+.goal-c{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:18px;margin-bottom:18px;}
+.goal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.goal-t{font-size:13px;font-weight:700;color:var(--ink);}
+.goal-ct{font-size:13px;color:var(--ink5);}
+.goal-msg{font-size:12px;margin-top:8px;font-weight:500;}
+.goal-msg.good{color:var(--jade);}
+.goal-msg.warn{color:var(--red);}
+/* HSK MAP */
+.hsk-map-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);margin-bottom:16px;}
+.hsk-lv-block{margin-bottom:18px;}
+.hsk-lv-hd{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.hsk-lv-badge{padding:4px 13px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;}
+.hlb-done{background:var(--jade);}
+.hlb-act{background:var(--red);}
+.hlb-locked{background:var(--ink15);color:var(--ink3);}
+.hsk-lv-name{font-size:14px;font-weight:600;color:var(--ink);}
+.hsk-lv-prog{font-size:12px;color:var(--ink3);margin-top:1px;}
+.path-steps{display:flex;flex-direction:column;gap:8px;}
+.ps{display:flex;align-items:center;gap:12px;background:var(--white);border:1.5px solid var(--ink15);border-radius:var(--r);padding:13px 15px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;touch-action:manipulation;}
+.ps::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent;transition:background .18s;}
+.ps:active:not(.ps-lk){transform:scale(.98);}
+.ps:hover:not(.ps-lk){border-color:var(--red);box-shadow:var(--sh-m);}
+.ps:hover:not(.ps-lk)::before,.ps-cur::before{background:var(--red)!important;}
+.ps-done{border-color:var(--jade);background:var(--jade-l);}
+.ps-done::before{background:var(--jade)!important;}
+.ps-cur{border-color:var(--red);background:var(--red-l);box-shadow:var(--sh-m);}
+.ps-lk{opacity:.38;cursor:not-allowed;}
+.ps-ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.psi-g{background:var(--jade-l);}
+.psi-r{background:var(--red-l);}
+.psi-k{background:var(--ink07);}
+.ps-info{flex:1;min-width:0;}
+.ps-name{font-size:14px;font-weight:700;color:var(--ink);}
+.ps-meta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.ps-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ps-xp{font-size:11px;font-weight:700;color:var(--gold);background:var(--gold-l);padding:2px 8px;border-radius:100px;}
+.ps-status{font-size:16px;}
+/* ============================================================ LESSON PAGE ============================================================ */
+#lesson-page{background:var(--cream);}
+.les-w{max-width:600px;margin:0 auto;padding:26px 16px;}
+.les-hd{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.les-back{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--ink15);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--ink5);transition:all .18s;flex-shrink:0;touch-action:manipulation;}
+.les-back:active{transform:scale(.9);}
+.les-pw{flex:1;}
+.les-plbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.ptabs{display:flex;gap:7px;margin-bottom:24px;}
+.ptab{flex:1;padding:9px;border-radius:var(--rs);border:1.5px solid var(--ink15);background:var(--white);font-size:11px;font-weight:700;color:var(--ink3);text-align:center;text-transform:uppercase;letter-spacing:.06em;transition:all .2s;}
+.ptab.act{border-color:var(--red);background:var(--red-l);color:var(--red);}
+.ptab.done{border-color:var(--jade);background:var(--jade-l);color:var(--jade);}
+/* Word card */
+.wcard{background:var(--ink);border-radius:var(--rl);padding:42px 30px;text-align:center;margin-bottom:18px;position:relative;overflow:hidden;}
+.wcard::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(200,57,43,.18),transparent 70%);pointer-events:none;}
+.wcard::after{content:'';position:absolute;bottom:-40px;left:-40px;width:130px;height:130px;background:radial-gradient(circle,rgba(201,146,10,.1),transparent 70%);pointer-events:none;}
+.wc-hsk{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:16px;}
+.wc-char{font-family:'Noto Serif SC',serif;font-size:90px;color:#fff;line-height:1.1;margin-bottom:10px;text-shadow:3px 6px 0 rgba(0,0,0,.3);position:relative;z-index:1;}
+.wc-py{font-family:'Playfair Display',serif;font-size:24px;color:#ff8566;font-style:italic;margin-bottom:5px;z-index:1;position:relative;}
+.wc-en{font-size:17px;color:rgba(255,255,255,.55);margin-bottom:5px;z-index:1;position:relative;}
+.wc-pos{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.22);z-index:1;position:relative;}
+.wc-aud{position:absolute;bottom:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.5);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;touch-action:manipulation;}
+.wc-aud:active{transform:scale(.9);}
+.usage-note{background:var(--gold-l);border:1px solid #f0d87a;border-radius:var(--r);padding:13px 17px;margin-bottom:13px;}
+.un-lbl{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.un-txt{font-size:13px;color:var(--ink7);line-height:1.7;}
+.ex-box{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);overflow:hidden;margin-bottom:18px;}
+.ex-item{padding:12px 17px;border-bottom:1px solid var(--ink07);}
+.ex-item:last-child{border-bottom:none;}
+.ex-cn{font-family:'Noto Serif SC',serif;font-size:17px;color:var(--ink);margin-bottom:3px;}
+.ex-py{font-size:12px;color:var(--red);font-style:italic;margin-bottom:2px;}
+.ex-en{font-size:12px;color:var(--ink5);}
+.learn-nav{display:flex;gap:10px;justify-content:center;}
+/* Grammar */
+.gram-c{background:var(--white);border:1px solid var(--ink15);border-radius:var(--rl);padding:26px;margin-bottom:18px;}
+.gram-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);margin-bottom:5px;}
+.gram-sub{font-size:13px;color:var(--ink5);margin-bottom:14px;}
+.gram-pat{background:var(--ink);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:17px;padding:13px 18px;border-radius:var(--rs);margin-bottom:14px;text-align:center;}
+.gram-rule{background:var(--blue-l);border:1px solid #bfdbfe;border-radius:var(--rs);padding:11px 15px;margin-bottom:10px;}
+.gram-rule-t{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.gram-rule-d{font-size:13px;color:var(--ink7);line-height:1.6;}
+/* Exercise */
+.ex-card{background:var(--white);border:1px solid var(--ink15);border-radius:var(--rl);padding:28px;margin-bottom:16px;}
+.ex-type{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px;}
+.ex-prompt{font-family:'Playfair Display',serif;font-size:19px;color:var(--ink);margin-bottom:22px;line-height:1.5;text-align:center;}
+.ex-prompt .big-char{font-family:'Noto Serif SC',serif;font-size:52px;display:block;margin:10px 0;color:var(--ink);}
+.ex-prompt .blank{display:inline-block;min-width:68px;border-bottom:3px solid var(--red);color:var(--red);padding:0 5px;text-align:center;}
+.opts2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.opts1{display:grid;grid-template-columns:1fr;gap:9px;}
+.opt{padding:14px 16px;border-radius:9px;border:1.5px solid var(--ink15);background:var(--white);font-size:14px;color:var(--ink);cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;text-align:center;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+.opt-fc{font-family:'Noto Serif SC',serif;font-size:22px;}
+.opt:active:not(:disabled){transform:scale(.97);}
+.opt:hover:not(:disabled){border-color:var(--red);background:var(--red-l);}
+.opt.correct{border-color:var(--jade)!important;background:var(--jade-l)!important;color:var(--jade)!important;font-weight:700;}
+.opt.wrong{border-color:#dc2626!important;background:#fef2f2!important;color:#dc2626!important;animation:shake .35s ease;}
+.opt:disabled{cursor:default;}
+/* Feedback */
+.feedback{border-radius:var(--r);padding:13px 17px;margin-bottom:13px;animation:fadeUp .28s ease;}
+.fb-c{background:var(--jade-l);border:1px solid #86efac;}
+.fb-w{background:#fef2f2;border:1px solid #fecaca;}
+.fb-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+.fb-c .fb-title{color:var(--jade);}
+.fb-w .fb-title{color:#dc2626;}
+.fb-text{font-size:13px;color:var(--ink7);line-height:1.6;}
+/* Completion */
+.comp-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(26,18,8,.86);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+.comp-overlay.open{display:flex;}
+.comp-card{background:var(--white);border-radius:var(--rl);padding:40px 32px;text-align:center;max-width:420px;width:100%;animation:bounceIn .45s cubic-bezier(.34,1.56,.64,1);}
+.comp-emoji{font-size:58px;display:block;margin-bottom:14px;}
+.comp-title{font-family:'Playfair Display',serif;font-size:30px;color:var(--ink);margin-bottom:6px;}
+.comp-sub{font-size:14px;color:var(--ink5);margin-bottom:18px;line-height:1.6;}
+.xp-pill{display:inline-flex;align-items:center;gap:7px;background:var(--gold-l);border:2px solid #f0d87a;padding:9px 20px;border-radius:100px;margin-bottom:18px;font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--gold);}
+.new-badges{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.nbadge{display:flex;align-items:center;gap:5px;background:var(--gold-l);border:1px solid #f0d87a;padding:5px 11px;border-radius:100px;font-size:12px;font-weight:700;color:var(--gold);}
+.ad-zone{background:var(--ink07);border:1px dashed var(--ink15);border-radius:var(--rs);padding:12px;margin:12px 0;font-size:12px;color:var(--ink3);text-align:center;}
+.test-fail{text-align:center;padding:32px 16px;}
+/* ============================================================ VOCAB PAGE ============================================================ */
+#vocab-page{background:var(--cream);}
+.voc-w{max-width:900px;margin:0 auto;padding:26px 16px;}
+.filt-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.filt{padding:6px 14px;border-radius:100px;border:1.5px solid var(--ink15);background:var(--white);font-size:12px;font-weight:600;color:var(--ink5);cursor:pointer;transition:all .18s;font-family:'DM Sans',sans-serif;touch-action:manipulation;}
+.filt.act{border-color:var(--red);background:var(--red-l);color:var(--red);}
+.voc-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:11px;}
+.voc-c{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:16px;transition:transform .18s,box-shadow .18s;cursor:pointer;}
+.voc-c:active{transform:scale(.97);}
+.vc-char{font-family:'Noto Serif SC',serif;font-size:34px;color:var(--ink);margin-bottom:4px;line-height:1;}
+.vc-py{font-size:12px;color:var(--red);font-style:italic;margin-bottom:3px;}
+.vc-en{font-size:12px;color:var(--ink5);margin-bottom:8px;}
+.prac-sec{background:var(--white);border:1px solid var(--ink15);border-radius:var(--rl);padding:22px;margin-bottom:20px;}
+/* ============================================================ RANKINGS PAGE ============================================================ */
+#rankings-page{background:var(--cream);}
+.rank-w{max-width:660px;margin:0 auto;padding:26px 16px;}
+.rank-tabs{display:flex;background:var(--ink07);border-radius:var(--rs);padding:3px;margin-bottom:18px;}
+.rank-tab{flex:1;padding:9px;border-radius:6px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--ink5);cursor:pointer;transition:all .18s;touch-action:manipulation;}
+.rank-tab.act{background:var(--white);color:var(--ink);box-shadow:var(--sh);}
+.rank-list{display:flex;flex-direction:column;gap:9px;}
+.rank-c{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:13px 16px;display:flex;align-items:center;gap:13px;transition:transform .18s;cursor:pointer;touch-action:manipulation;}
+.rank-c:active{transform:scale(.98);}
+.rank-c.r1{border-color:#f0d87a;background:var(--gold-l);}
+.rank-c.r2{border-color:#d0d8e8;background:#f7f8fb;}
+.rank-c.r3{border-color:#e8cdb4;background:#fdf6f0;}
+.rank-c.is-me{border-color:var(--red);background:var(--red-l);}
+.rank-pos{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;min-width:30px;text-align:center;}
+.r1 .rank-pos{color:var(--gold);}
+.r2 .rank-pos{color:#607090;}
+.r3 .rank-pos{color:#906040;}
+.rank-av{width:38px;height:38px;border-radius:50%;background:var(--red-l);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:14px;color:var(--red);font-weight:700;flex-shrink:0;overflow:hidden;}
+.rank-av img{width:100%;height:100%;object-fit:cover;}
+.rank-info{flex:1;min-width:0;}
+.rank-name{font-size:14px;font-weight:700;color:var(--ink);}
+.rank-meta{font-size:11px;color:var(--ink3);margin-top:2px;}
+.rank-xp{text-align:right;}
+.rank-xp-v{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--red);}
+.rank-xp-l{font-size:10px;color:var(--ink3);}
+.you-tag{background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;font-family:'DM Sans',sans-serif;margin-left:5px;}
+.follow-btn{padding:5px 12px;border-radius:100px;border:1.5px solid var(--ink15);background:var(--white);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;color:var(--ink5);touch-action:manipulation;}
+.follow-btn.fing{border-color:var(--jade);background:var(--jade-l);color:var(--jade);}
+/* Invite card */
+.inv-card{background:linear-gradient(135deg,var(--ink7),var(--ink));border-radius:var(--rl);padding:20px;margin-bottom:18px;position:relative;overflow:hidden;}
+.inv-card::before{content:'友';font-family:'Noto Serif SC',serif;position:absolute;right:-8px;bottom:-18px;font-size:110px;color:rgba(255,255,255,.04);line-height:1;pointer-events:none;}
+.inv-t{font-family:'Playfair Display',serif;font-size:17px;color:#fff;margin-bottom:4px;}
+.inv-s{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:13px;}
+.inv-link{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--rs);padding:9px 13px;font-size:12px;color:rgba(255,255,255,.7);word-break:break-all;margin-bottom:11px;font-family:'DM Sans',sans-serif;}
+/* Friend search */
+.friend-search-wrap{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:18px;margin-bottom:14px;}
+.friend-search-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.search-row{display:flex;gap:8px;}
+.search-inp{flex:1;padding:10px 14px;border:1.5px solid var(--ink15);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .2s;}
+.search-inp:focus{border-color:var(--red);}
+.search-results{margin-top:10px;display:flex;flex-direction:column;gap:7px;}
+.sr-item{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:var(--rs);background:var(--ink07);cursor:pointer;transition:all .15s;}
+.sr-item:hover{background:var(--ink15);}
+.sr-av{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:13px;font-weight:700;flex-shrink:0;}
+.sr-name{flex:1;font-size:13px;font-weight:600;color:var(--ink);}
+.sr-xp{font-size:11px;color:var(--ink3);}
+/* ============================================================ PROFILE PAGE ============================================================ */
+#profile-page{background:var(--cream);}
+.prof-w{max-width:700px;margin:0 auto;padding:26px 16px;}
+.prof-hero{background:var(--ink);border-radius:var(--rl);padding:26px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.prof-av-lg{width:80px;height:80px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:30px;color:#fff;border:3px solid rgba(255,255,255,.18);flex-shrink:0;overflow:hidden;cursor:pointer;position:relative;}
+.prof-av-lg img{width:100%;height:100%;object-fit:cover;}
+.prof-av-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;font-size:18px;border-radius:50%;}
+.prof-av-lg:hover .prof-av-overlay{display:flex;}
+.prof-name{font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-bottom:3px;}
+.prof-email{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:6px;}
+.prof-lev{background:var(--red);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:100px;text-transform:uppercase;display:inline-block;}
+.prof-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-left:auto;}
+.pst-v{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff;}
+.pst-l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.3);}
+.prof-sec{background:var(--white);border:1px solid var(--ink15);border-radius:var(--r);padding:22px;margin-bottom:12px;}
+.prof-sec-t{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:16px;}
+/* HSK scores */
+.hsk-scores-g{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
+.hsk-si{background:var(--ink07);border-radius:10px;padding:13px;text-align:center;border:1.5px solid transparent;transition:all .18s;}
+.hsk-si.passed{border-color:var(--jade);background:var(--jade-l);}
+.hsk-si.failed{border-color:#fca5a5;background:#fef2f2;}
+.hsk-si-lv{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:4px;}
+.hsk-si-v{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);}
+.passed .hsk-si-v{color:var(--jade);}
+.failed .hsk-si-v{color:#dc2626;}
+.hsk-si-max{font-size:10px;color:var(--ink3);}
+.hsk-si-pass{font-size:10px;font-weight:700;margin-top:3px;}
+.passed .hsk-si-pass{color:var(--jade);}
+.failed .hsk-si-pass{color:#dc2626;}
+/* Lang selector */
+.lang-sel{display:flex;gap:8px;flex-wrap:wrap;}
+.lang-b{padding:9px 16px;border-radius:var(--rs);border:1.5px solid var(--ink15);background:var(--white);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;color:var(--ink5);touch-action:manipulation;}
+.lang-b.sel{border-color:var(--red);background:var(--red-l);color:var(--red);}
+/* Goal opts */
+.goal-opts{display:flex;gap:8px;flex-wrap:wrap;}
+/* Following */
+.follow-list{display:flex;flex-direction:column;gap:7px;}
+.fi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);background:var(--ink07);cursor:pointer;transition:all .15s;}
+.fi:hover{background:var(--ink15);}
+.fi-av{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:13px;font-weight:700;flex-shrink:0;overflow:hidden;}
+.fi-av img{width:100%;height:100%;object-fit:cover;}
+.fi-name{flex:1;font-size:13px;font-weight:600;color:var(--ink);}
+.fi-xp{font-size:11px;color:var(--ink3);}
+/* Badges */
+.badges-g{display:flex;flex-wrap:wrap;gap:8px;}
+.bch{display:flex;align-items:center;gap:6px;background:var(--gold-l);border:1px solid #f0d87a;border-radius:100px;padding:5px 12px;}
+.bch.locked{background:var(--ink07);border-color:var(--ink15);opacity:.35;}
+.b-ico{font-size:16px;}
+.b-name{font-size:11px;font-weight:700;color:var(--gold);}
+.bch.locked .b-name{color:var(--ink3);}
+/* Super Hanji */
+.super-c{background:linear-gradient(135deg,#1a0a30,#2d1a50);border-radius:var(--rl);padding:22px;margin-bottom:14px;position:relative;overflow:hidden;}
+.super-c::before{content:'超';font-family:'Noto Serif SC',serif;position:absolute;right:-12px;bottom:-18px;font-size:130px;color:rgba(255,255,255,.05);line-height:1;}
+.super-title{font-family:'Playfair Display',serif;font-size:19px;color:#fff;margin-bottom:4px;}
+.super-sub{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:14px;}
+.super-perks{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.super-perk{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.78);}
+.super-price{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:#c084fc;margin-bottom:2px;}
+.super-price sub{font-size:14px;color:rgba(255,255,255,.35);font-family:'DM Sans',sans-serif;}
+.super-note{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:14px;}
+/* User profile view */
+.prof-view-overlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(26,18,8,.8);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
+.prof-view-overlay.open{display:flex;}
+.prof-view-card{background:var(--white);border-radius:var(--rl);width:100%;max-width:380px;padding:28px;animation:slideUp .3s ease;}
+/* Permission dialog */
+.perm-overlay{display:none;position:fixed;inset:0;z-index:900;background:rgba(26,18,8,.8);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;padding:0;}
+.perm-overlay.open{display:flex;}
+.perm-sheet{background:var(--white);border-radius:var(--rl) var(--rl) 0 0;width:100%;max-width:500px;padding:28px 24px;animation:slideUp .35s ease;}
+.perm-ico{font-size:44px;text-align:center;margin-bottom:12px;}
+.perm-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--ink);text-align:center;margin-bottom:6px;}
+.perm-sub{font-size:14px;color:var(--ink5);text-align:center;margin-bottom:22px;line-height:1.6;}
+/* UTILS */
+.empty-s{text-align:center;padding:50px 20px;}
+.empty-ch{font-family:'Noto Serif SC',serif;font-size:58px;color:var(--ink15);margin-bottom:14px;}
+.empty-t{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:7px;}
+.empty-d{font-size:13px;color:var(--ink5);margin-bottom:20px;}
+.load-s{min-height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.load-ch{font-family:'Noto Serif SC',serif;font-size:46px;color:var(--red);animation:pulse 1.5s infinite;}
+.divider{height:1px;background:var(--ink07);margin:16px 0;}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--ink);margin-bottom:5px;}
+.page-sub{font-size:14px;color:var(--ink5);margin-bottom:20px;}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:10px;}
+@media(max-width:768px){.stats-g{grid-template-columns:repeat(2,1fr);}.steps-g{grid-template-columns:1fr;}.price-g{grid-template-columns:1fr;}.prof-stats{margin-left:0;width:100%;}.prof-hero{flex-direction:column;text-align:center;}.hsk-scores-g{grid-template-columns:repeat(2,1fr);}.str-r{display:none;}.opts2{grid-template-columns:1fr;}.pt-opts{grid-template-columns:1fr;}}
+@media(max-width:480px){.wc-char{font-size:74px;}.htitle{font-size:32px;}}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav id="nav">
+  <div class="nav-logo" onclick="goHome()"><span class="nlc">汉</span><span class="nlt">Hanji</span></div>
+  <div class="nav-r">
+    <div id="navAuth" style="display:flex;gap:8px">
+      <button class="btn btn-g btn-sm" onclick="openAuth('login')" id="navLoginBtn">Log in</button>
+      <button class="btn btn-r btn-sm" onclick="openAuth('register')" id="navRegBtn">Start Free</button>
+    </div>
+    <div id="navUser" style="display:none;align-items:center;gap:10px">
+      <div class="nav-streak" id="navStreak" onclick="showStreakInfo()">🔥 0</div>
+      <div class="nav-av" id="navAv" onclick="showPage('profile-page')">汉</div>
+    </div>
+  </div>
+</nav>
+
+<!-- BOTTOM NAV -->
+<div id="bot-nav" style="display:none">
+  <button class="bn" id="bn-home" onclick="goHome()"><span class="bn-ico">🏠</span><span class="bn-lbl" data-t="home">Home</span></button>
+  <button class="bn" id="bn-vocab" onclick="showPage('vocab-page')"><span class="bn-ico">📚</span><span class="bn-lbl" data-t="vocab">Words</span></button>
+  <button class="bn" id="bn-rank" onclick="showPage('rankings-page');loadRankings()"><span class="bn-ico">🏆</span><span class="bn-lbl" data-t="rankings">Rankings</span></button>
+  <button class="bn" id="bn-prof" onclick="showPage('profile-page')"><span class="bn-ico">👤</span><span class="bn-lbl" data-t="profile">Profile</span></button>
+</div>
+
+<!-- ══════════════════ LANDING ══════════════════ -->
+<div id="landing" class="page active" style="padding-top:0">
+  <div class="hero">
+    <div class="hero-bg">学</div>
+    <div class="htag"><span class="hdot"></span><span data-t="hsk16">HSK 1 – HSK 6</span></div>
+    <h1 class="htitle" data-t="heroTitle">Pass the HSK<br/><em>Faster with Hanji</em></h1>
+    <p class="hsub" data-t="heroSub">Short daily lessons built for HSK exams. Science-backed spaced repetition.</p>
+    <div class="hbtns">
+      <button class="btn btn-r btn-lg" onclick="openAuth('register')" data-t="startFree">Start Learning Free →</button>
+      <button class="btn btn-o btn-lg" onclick="showPage('rankings-page');loadRankings()" data-t="seeRankings">See Rankings</button>
+    </div>
+  </div>
+  <div class="how-sec"><div class="how-in">
+    <div class="sec-tag" data-t="howWorks">How It Works</div>
+    <h2 class="sec-t" style="color:#fff" data-t="oneLoop">One loop. Until mastery.</h2>
+    <div class="steps-g">
+      <div class="step-c"><div class="step-n">01</div><span class="step-i">📖</span><div class="step-t" data-t="learn">Learn</div><div class="step-d" data-t="learnDesc">Vocabulary + grammar with explanations and real examples.</div></div>
+      <div class="step-c"><div class="step-n">02</div><span class="step-i">✏️</span><div class="step-t" data-t="practice">Practice</div><div class="step-d" data-t="practiceDesc">6+ rotating exercise types. Never boring, never the same twice.</div></div>
+      <div class="step-c"><div class="step-n">03</div><span class="step-i">🎯</span><div class="step-t" data-t="testAdvance">Test & Advance</div><div class="step-d" data-t="testDesc">Pass 80% to unlock. Fail and get targeted practice on weak spots.</div></div>
+    </div>
+  </div></div>
+  <div class="price-sec"><div class="price-in">
+    <div class="sec-tag" style="text-align:center" data-t="pricing">Pricing</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,40px);color:var(--ink)" data-t="pricingTitle">Free to start. Powerful when serious.</h2>
+    <div class="price-g">
+      <div class="price-c">
+        <div class="price-name" data-t="free">Free</div>
+        <div class="price-amt">¥0 <span data-t="forever">/ forever</span></div>
+        <div class="price-desc" data-t="freeDesc">Full lessons. All HSK levels.</div>
+        <ul class="pf-list">
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="pf1">All lessons HSK 1–6</span></li>
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="pf2">Streaks and XP</span></li>
+          <li class="pf-item"><span class="pfn">✗</span><span data-t="pf3">Ads after lessons</span></li>
+          <li class="pf-item"><span class="pfn">✗</span><span data-t="pf4">No mock exams</span></li>
+        </ul>
+        <button class="btn btn-o btn-full" onclick="openAuth('register')" data-t="getStarted">Get Started Free</button>
+      </div>
+      <div class="price-c feat">
+        <div class="price-badge" data-t="bestValue">Best Value</div>
+        <div class="price-name">Super Hanji</div>
+        <div class="price-amt">¥14 <span data-t="perMonth">/ month</span></div>
+        <div class="price-desc" data-t="premiumDesc">¥99/year — save 41%</div>
+        <ul class="pf-list">
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="ppf1">No ads. Ever.</span></li>
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="ppf2">Full HSK mock exams</span></li>
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="ppf3">Streak shield</span></li>
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="ppf4">1.5× XP boost</span></li>
+          <li class="pf-item"><span class="pfy">✓</span><span data-t="ppf5">Unlimited practice</span></li>
+        </ul>
+        <button class="btn btn-r btn-full" onclick="openAuth('register')" data-t="tryFree">Try Free → Upgrade Later</button>
+      </div>
+    </div>
+  </div></div>
+  <div class="land-footer"><div style="font-family:'Noto Serif SC',serif;font-size:24px;color:var(--red);margin-bottom:9px">汉记</div><p>© 2025 Hanji</p></div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authModal">
+  <div class="modal">
+    <button class="mx" onclick="closeAuth()">✕</button>
+    <div class="mlogo"><span class="mlogo-c">汉</span><span class="mlogo-t">Hanji</span></div>
+    <h2 class="mtitle" id="modalTitle">Welcome back</h2>
+    <p class="msub" id="modalSub">Continue your HSK journey</p>
+    <div class="tab-row">
+      <button class="tab-b act" id="tabL" onclick="switchAuthTab('login')" data-t="logIn">Log In</button>
+      <button class="tab-b" id="tabR" onclick="switchAuthTab('register')" data-t="register">Register</button>
+    </div>
+    <div id="authAlert"></div>
+    <div id="loginForm">
+      <div class="fg"><label class="lbl" data-t="email">Email</label><input type="email" class="inp" id="loginEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="fg"><label class="lbl" data-t="password">Password</label><input type="password" class="inp" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn btn-r btn-full" onclick="doLogin()" id="loginBtn" data-t="logIn">Log In</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="fg"><label class="lbl" data-t="fullName">Full Name</label><input type="text" class="inp" id="regName" placeholder="Your name"/></div>
+      <div class="fg"><label class="lbl" data-t="username2">Username</label><input type="text" class="inp" id="regUsername" placeholder="@yourname"/></div>
+      <div class="fg"><label class="lbl" data-t="email">Email</label><input type="email" class="inp" id="regEmail" placeholder="you@example.com"/></div>
+      <div class="fg"><label class="lbl" data-t="password">Password</label><input type="password" class="inp" id="regPass" placeholder="Min 6 characters"/></div>
+      <button class="btn btn-r btn-full" onclick="doRegister()" id="registerBtn" data-t="createAccount">Create Free Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ ONBOARDING ══════════════════ -->
+<div id="onboarding" class="page">
+  <div class="ob-w">
+    <div class="ob-prog"><div class="ob-pip done" id="pip1"></div><div class="ob-pip" id="pip2"></div><div class="ob-pip" id="pip3"></div></div>
+    <div class="ob-step active" id="ob1">
+      <div class="sec-lbl" data-t="welcomeHanji">Welcome to Hanji</div>
+      <h2 class="ob-title" data-t="knowChinese">Do you already know Chinese?</h2>
+      <p class="ob-sub" data-t="helpLevel">This helps us place you at the right level.</p>
+      <div class="ch-grid">
+        <div class="ch-c" onclick="selChoice(this,'beginner')"><span class="ch-ico">🌱</span><div><div class="ch-t" data-t="beginner">Complete beginner</div><div class="ch-d" data-t="beginnerDesc">Start from HSK 1</div></div></div>
+        <div class="ch-c" onclick="selChoice(this,'some')"><span class="ch-ico">📖</span><div><div class="ch-t" data-t="someKnow">I know a little</div><div class="ch-d" data-t="someDesc">Know some basics</div></div></div>
+        <div class="ch-c" onclick="selChoice(this,'test')"><span class="ch-ico">🎯</span><div><div class="ch-t" data-t="testLevel">Test my level</div><div class="ch-d" data-t="testDesc2">10-question placement test</div></div></div>
+      </div>
+      <button class="btn btn-r btn-lg" onclick="nextOb()" id="ob1Btn" disabled data-t="continue">Continue →</button>
+    </div>
+    <div class="ob-step" id="ob2">
+      <div class="sec-lbl" data-t="yourGoal">Your Goal</div>
+      <h2 class="ob-title" data-t="whichHSK">Which HSK are you targeting?</h2>
+      <p class="ob-sub" data-t="changeLater">You can change this anytime.</p>
+      <div class="ch-grid">
+        <div class="ch-c" onclick="selHSK(this,1)"><span class="ch-ico">1️⃣</span><div><div class="ch-t">HSK 1</div><div class="ch-d" data-t="hsk1desc">150 words · Beginner</div></div></div>
+        <div class="ch-c" onclick="selHSK(this,2)"><span class="ch-ico">2️⃣</span><div><div class="ch-t">HSK 2</div><div class="ch-d" data-t="hsk2desc">300 words · Elementary</div></div></div>
+        <div class="ch-c" onclick="selHSK(this,3)"><span class="ch-ico">3️⃣</span><div><div class="ch-t">HSK 3</div><div class="ch-d" data-t="hsk3desc">600 words · Intermediate</div></div></div>
+        <div class="ch-c" onclick="selHSK(this,4)"><span class="ch-ico">4️⃣</span><div><div class="ch-t">HSK 4</div><div class="ch-d" data-t="hsk4desc">1200 words · Upper Intermediate</div></div></div>
+      </div>
+      <button class="btn btn-r btn-lg" onclick="nextOb()" id="ob2Btn" disabled data-t="continue">Continue →</button>
+    </div>
+    <div class="ob-step" id="ob3">
+      <div class="sec-lbl" data-t="dailyHabit">Daily Habit</div>
+      <h2 class="ob-title" data-t="howMany">Words per day?</h2>
+      <p class="ob-sub" data-t="sweetSpot">10/day is the sweet spot for retention.</p>
+      <div class="goal-row" id="obGoalRow" style="justify-content:center">
+        <button class="goal-b" onclick="selGoal(5)">5</button>
+        <button class="goal-b sel" onclick="selGoal(10)">10</button>
+        <button class="goal-b" onclick="selGoal(20)">20</button>
+        <button class="goal-b" onclick="selGoal(30)">30</button>
+      </div>
+      <button class="btn btn-r btn-lg" onclick="finishOb()" data-t="startLearning">Start Learning →</button>
+    </div>
+    <div class="ob-step" id="ob-pt">
+      <div class="sec-lbl" data-t="placementTest">Placement Test</div>
+      <h2 class="ob-title" data-t="findLevel">Let's find your level</h2>
+      <p class="ob-sub" data-t="tenQ">10 quick questions.</p>
+      <div class="pt-card" id="ptCard">
+        <div class="pt-num" id="ptNum"></div>
+        <div class="pt-q" id="ptQ"></div>
+        <div class="pt-opts" id="ptOpts"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ DASHBOARD ══════════════════ -->
+<div id="dashboard" class="page">
+  <div class="dash-w">
+    <div class="dash-head">
+      <div><div class="dash-greet">Good <em id="dashTime">day</em>, <span id="dashName">Learner</span></div><div class="dash-date" id="dashDate"></div></div>
+    </div>
+    <div id="psychBannerZone"></div>
+    <div class="str-bar" onclick="showStreakInfo()">
+      <div class="str-l"><div class="str-fire">🔥</div><div><div class="str-num" id="dashStreak">0</div><div class="str-lbl" data-t="dayStreak">Day Streak</div></div></div>
+      <div class="str-r">
+        <div><div class="ssv" id="dashXP">0</div><div class="ssl" data-t="totalXP">Total XP</div></div>
+        <div><div class="ssv" id="dashWords">0</div><div class="ssl" data-t="wordsKnown">Words</div></div>
+      </div>
+    </div>
+    <div class="stats-g">
+      <div class="stat-b"><div class="stat-ico">📚</div><div class="stat-v" id="stToday">0</div><div class="stat-l" data-t="wordsToday">Words Today</div></div>
+      <div class="stat-b"><div class="stat-ico">⭐</div><div class="stat-v" id="stMastered">0</div><div class="stat-l" data-t="mastered">Mastered</div></div>
+      <div class="stat-b"><div class="stat-ico">🎯</div><div class="stat-v" id="stLevel">1</div><div class="stat-l" data-t="hskLevel">HSK Level</div></div>
+      <div class="stat-b"><div class="stat-ico">🏆</div><div class="stat-v" id="stBest">0</div><div class="stat-l" data-t="bestStreak">Best Streak</div></div>
+    </div>
+    <div class="goal-c">
+      <div class="goal-hd"><div class="goal-t" data-t="dailyGoal">📌 Daily Goal</div><div class="goal-ct"><span id="goalDone">0</span> / <span id="goalTarget">10</span></div></div>
+      <div class="pbar"><div class="pfill" id="goalBar" style="width:0%"></div></div>
+      <div class="goal-msg" id="goalMsg"></div>
+    </div>
+    <div class="hsk-map-title" data-t="learningPath">Your Learning Path</div>
+    <div id="hskMap"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ LESSON PAGE ══════════════════ -->
+<div id="lesson-page" class="page">
+  <div class="les-w">
+    <div class="les-hd">
+      <div class="les-back" onclick="leavelesson()">←</div>
+      <div class="les-pw"><div class="les-plbl" id="lesPhaseLbl">LEARN PHASE</div><div class="pbar"><div class="pfill" id="lesProgBar" style="width:0%"></div></div></div>
+    </div>
+    <div class="ptabs">
+      <div class="ptab act" id="ptab-learn" data-t="learn">Learn</div>
+      <div class="ptab" id="ptab-practice" data-t="practice">Practice</div>
+      <div class="ptab" id="ptab-test" data-t="test">Test</div>
+    </div>
+    <div id="learn-ph"></div>
+    <div id="practice-ph" style="display:none"></div>
+    <div id="test-ph" style="display:none"></div>
+  </div>
+</div>
+
+<!-- Completion overlay -->
+<div class="comp-overlay" id="compOverlay">
+  <div class="comp-card">
+    <span class="comp-emoji" id="compEmoji">🎉</span>
+    <div class="comp-title" id="compTitle"></div>
+    <div class="comp-sub" id="compSub"></div>
+    <div class="xp-pill">✨ +<span id="compXP">50</span> XP</div>
+    <div class="new-badges" id="compBadges"></div>
+    <div class="ad-zone" id="compAd" style="display:none"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px" data-t="advertisement">Advertisement</div><div style="font-size:12px;color:var(--ink5)" data-t="adMsg">Ad space — upgrade to Super Hanji to remove</div><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="openUpgrade()" data-t="removeAds">Remove Ads →</button></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-o" onclick="closeComp()" data-t="dashboard">Dashboard</button>
+      <button class="btn btn-r" onclick="nextLesson()" data-t="nextLesson">Next Lesson →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade overlay -->
+<div class="overlay" id="upgradeOverlay">
+  <div class="modal">
+    <button class="mx" onclick="eid('upgradeOverlay').classList.remove('open')">✕</button>
+    <div style="text-align:center;margin-bottom:16px"><span style="font-size:42px">⚡</span><h2 class="fd" style="font-size:24px;color:var(--ink);margin:10px 0 4px" data-t="unlockSuper">Unlock Super Hanji</h2><p style="font-size:13px;color:var(--ink5)" data-t="superDesc">Reach your HSK goal 2× faster</p></div>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px">
+      <div style="background:var(--ink07);border-radius:var(--rs);padding:9px 13px;font-size:13px">🚫 <span data-t="noAds">No ads ever</span></div>
+      <div style="background:var(--ink07);border-radius:var(--rs);padding:9px 13px;font-size:13px">📝 <span data-t="mockExams">Full HSK mock exams</span></div>
+      <div style="background:var(--ink07);border-radius:var(--rs);padding:9px 13px;font-size:13px">🛡️ <span data-t="streakShield">Streak shield</span></div>
+      <div style="background:var(--ink07);border-radius:var(--rs);padding:9px 13px;font-size:13px">✨ 1.5× <span data-t="xpBoost">XP boost</span></div>
+    </div>
+    <div style="text-align:center;margin-bottom:14px"><div class="fd" style="font-size:28px;font-weight:700;color:var(--red)">¥14<span style="font-size:14px;color:var(--ink3);font-family:'DM Sans',sans-serif">/mo</span></div><div style="font-size:12px;color:var(--ink5);margin-top:3px" data-t="yearlyDeal">¥99/year — save 41%</div></div>
+    <button class="btn btn-r btn-full" onclick="joinWaitlist()" data-t="joinWaitlist">Join Waitlist →</button>
+    <p style="font-size:11px;color:var(--ink3);text-align:center;margin-top:8px" data-t="comingSoon">Payments launching soon.</p>
+  </div>
+</div>
+
+<!-- User profile view -->
+<div class="prof-view-overlay" id="profViewOverlay">
+  <div class="prof-view-card">
+    <button class="mx" onclick="eid('profViewOverlay').classList.remove('open')">✕</button>
+    <div id="profViewContent"></div>
+  </div>
+</div>
+
+<!-- Permission sheet -->
+<div class="perm-overlay" id="permOverlay">
+  <div class="perm-sheet">
+    <div class="perm-ico" id="permIco">📍</div>
+    <div class="perm-title" id="permTitle">Allow Access?</div>
+    <div class="perm-sub" id="permSub">This helps find friends near you.</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-o btn-full" onclick="denyPerm()">Not Now</button>
+      <button class="btn btn-r btn-full" onclick="allowPerm()">Allow</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ VOCAB PAGE ══════════════════ -->
+<div id="vocab-page" class="page">
+  <div class="voc-w">
+    <div class="sec-lbl" data-t="vocabulary">Vocabulary</div>
+    <h2 class="page-title" data-t="allWords">All Learned Words</h2>
+    <div class="prac-sec">
+      <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px" data-t="practiceAll">Practice Everything</div>
+      <p style="font-size:13px;color:var(--ink5);margin-bottom:14px" data-t="practiceAllDesc">Review all words with rotating exercises.</p>
+      <button class="btn btn-r" onclick="startPracticeAll()" data-t="startPractice">Start Practice →</button>
+    </div>
+    <p style="font-size:14px;color:var(--ink5);margin-bottom:16px" id="vocCountLbl"></p>
+    <div class="filt-row">
+      <button class="filt act" onclick="filtVoc('all',this)" data-t="all">All</button>
+      <button class="filt" onclick="filtVoc('learning',this)" data-t="learning">Learning</button>
+      <button class="filt" onclick="filtVoc('reviewing',this)" data-t="reviewing">Reviewing</button>
+      <button class="filt" onclick="filtVoc('mastered',this)" data-t="mastered">Mastered</button>
+    </div>
+    <div class="voc-g" id="vocGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ RANKINGS PAGE ══════════════════ -->
+<div id="rankings-page" class="page">
+  <div class="rank-w">
+    <div class="sec-lbl" data-t="globalRankings">Rankings</div>
+    <h2 class="page-title" data-t="leaderboard">Leaderboard</h2>
+    <div class="inv-card">
+      <div class="inv-t" data-t="inviteFriends">🎁 Invite Friends</div>
+      <div class="inv-s" data-t="inviteDesc">Invite a friend → earn Friend badge + 100 XP!</div>
+      <div class="inv-link" id="inviteLink">hanji.app/invite/...</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-o btn-sm" onclick="copyInvite()" data-t="copyLink">📋 Copy</button>
+        <button class="btn btn-gold btn-sm" onclick="shareInvite()" data-t="share">📤 Share</button>
+      </div>
+    </div>
+    <!-- Friend search -->
+    <div class="friend-search-wrap">
+      <div class="friend-search-title" data-t="findFriends">🔍 Find Friends</div>
+      <div class="search-row">
+        <input type="text" class="search-inp" id="friendSearch" placeholder="Search by username..." onkeydown="if(event.key==='Enter')searchFriends()"/>
+        <button class="btn btn-r btn-sm" onclick="searchFriends()" data-t="search">Search</button>
+      </div>
+      <div id="searchResults"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-o btn-sm" onclick="findNearby()" data-t="findNearby">📍 Find Nearby</button>
+        <button class="btn btn-o btn-sm" onclick="findContacts()" data-t="findContacts">📱 From Contacts</button>
+      </div>
+    </div>
+    <div class="rank-tabs">
+      <button class="rank-tab act" id="rt-g" onclick="switchRankTab('global')" data-t="global">Global</button>
+      <button class="rank-tab" id="rt-f" onclick="switchRankTab('friends')" data-t="friends">Friends</button>
+    </div>
+    <div id="rankContent"><div class="load-s"><div class="load-ch">排</div></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════ PROFILE PAGE ══════════════════ -->
+<div id="profile-page" class="page">
+  <div class="prof-w">
+    <div class="prof-hero">
+      <div class="prof-av-lg" id="profAvLg" onclick="changeAvatar()">汉<div class="prof-av-overlay">📷</div></div>
+      <div style="flex:1;min-width:0">
+        <div class="prof-name" id="profName">Learner</div>
+        <div class="prof-email" id="profEmail"></div>
+        <div class="prof-lev" id="profLev">HSK 1</div>
+      </div>
+      <div class="prof-stats">
+        <div><div class="pst-v" id="profXP">0</div><div class="pst-l" data-t="xp">XP</div></div>
+        <div><div class="pst-v" id="profStreak">0</div><div class="pst-l" data-t="streak">Streak</div></div>
+        <div><div class="pst-v" id="profWords">0</div><div class="pst-l" data-t="words">Words</div></div>
+      </div>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(this)"/>
+
+    <!-- Super Hanji -->
+    <div class="super-c" id="superCard">
+      <div class="super-title">⚡ Super Hanji</div>
+      <div class="super-sub" data-t="superSubDesc">Reach your HSK goal 2× faster</div>
+      <div class="super-perks">
+        <div class="super-perk">🚫 <span data-t="noAds">No ads</span></div>
+        <div class="super-perk">📝 <span data-t="mockExams">Full HSK mock exams</span></div>
+        <div class="super-perk">🛡️ <span data-t="streakShield">Streak shield</span></div>
+        <div class="super-perk">✨ 1.5× <span data-t="xpBoost">XP boost</span></div>
+      </div>
+      <div class="super-price">¥14<sub>/mo</sub></div>
+      <div class="super-note" data-t="yearlyDeal">¥99/year — save 41%</div>
+      <button class="btn btn-gold" onclick="openUpgrade()" data-t="joinWaitlist">Join Waitlist →</button>
+    </div>
+
+    <!-- HSK Test Scores -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="hskScores">HSK Test Scores (out of 300)</div>
+      <div class="hsk-scores-g" id="hskScoresG"></div>
+    </div>
+
+    <!-- Edit Profile -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="editProfile">Edit Profile</div>
+      <div class="fg">
+        <label class="lbl" data-t="fullName">Full Name</label>
+        <input type="text" class="inp" id="editName" placeholder="Your name"/>
+      </div>
+      <div class="fg">
+        <label class="lbl" data-t="username2">Username</label>
+        <input type="text" class="inp" id="editUsername" placeholder="@yourname"/>
+        <div class="fg-hint" id="usernameHint" data-t="usernameLimit">Can be changed 2 times per month.</div>
+      </div>
+      <div class="fg">
+        <label class="lbl" data-t="bio">Bio</label>
+        <input type="text" class="inp" id="editBio" placeholder="Tell the community..."/>
+      </div>
+      <div class="fg">
+        <label class="lbl" data-t="country">Country</label>
+        <input type="text" class="inp" id="editCountry" placeholder="Your country"/>
+      </div>
+      <div id="profMsg"></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn btn-r" onclick="saveProf()" id="saveProfBtn" data-t="saveChanges">Save Changes</button>
+        <button class="btn btn-o" onclick="logout()" style="color:var(--red)" data-t="logOut">Log Out</button>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="appLanguage">App Language</div>
+      <p style="font-size:13px;color:var(--ink5);margin-bottom:12px" data-t="langNote">Changes all labels. Learning content stays in Chinese.</p>
+      <div class="lang-sel">
+        <button class="lang-b sel" onclick="setLang('en',this)">🇬🇧 English</button>
+        <button class="lang-b" onclick="setLang('ru',this)">🇷🇺 Русский</button>
+        <button class="lang-b" onclick="setLang('tk',this)">🇹🇲 Türkmen</button>
+      </div>
+    </div>
+
+    <!-- Daily Goal -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="dailyGoalSetting">Daily Word Goal</div>
+      <div class="goal-opts" id="profGoalOpts">
+        <button class="goal-b" onclick="selProfGoal(5)">5</button>
+        <button class="goal-b sel" onclick="selProfGoal(10)">10</button>
+        <button class="goal-b" onclick="selProfGoal(20)">20</button>
+        <button class="goal-b" onclick="selProfGoal(30)">30</button>
+      </div>
+    </div>
+
+    <!-- Following -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="following">Following</div>
+      <div id="followingList"></div>
+    </div>
+
+    <!-- Badges -->
+    <div class="prof-sec">
+      <div class="prof-sec-t" data-t="badges">Badges & Achievements</div>
+      <div class="badges-g" id="profBadges"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+'use strict';
+// ============================================================
+// SUPABASE
+// ============================================================
+const SUPA_URL='https://wppuesklskfnrfqsdstk.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwcHVlc2tsc2tmbnJmcXNkc3RrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0OTA5MzIsImV4cCI6MjA4OTA2NjkzMn0.A0_9hd2ifdtqMzwINFG2Is6ggzzAoQDeN2XERdnMnZ8';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+// ============================================================
+// TRANSLATIONS — ALL STRINGS INCLUDING EXERCISE PROMPTS
+// ============================================================
+const LANGS={
+  en:{
+    home:'Home',vocab:'Words',rankings:'Rankings',profile:'Profile',
+    hsk16:'HSK 1 – HSK 6',heroTitle:'Pass the HSK Faster with Hanji',
+    heroSub:'Short daily lessons built for HSK exams.',
+    startFree:'Start Learning Free →',seeRankings:'See Rankings',
+    howWorks:'How It Works',oneLoop:'One loop. Until mastery.',
+    learn:'Learn',practice:'Practice',testAdvance:'Test & Advance',
+    learnDesc:'Vocabulary + grammar with explanations and real examples.',
+    practiceDesc:'6+ rotating exercise types. Never boring.',
+    testDesc:'Pass 80% to unlock. Fail = targeted practice.',
+    pricing:'Pricing',pricingTitle:'Free to start. Powerful when serious.',
+    free:'Free',forever:'/ forever',freeDesc:'Full lessons. All HSK levels.',
+    pf1:'All lessons HSK 1–6',pf2:'Streaks and XP',pf3:'Ads after lessons',pf4:'No mock exams',
+    bestValue:'Best Value',perMonth:'/ month',premiumDesc:'¥99/year — save 41%',
+    ppf1:'No ads. Ever.',ppf2:'Full HSK mock exams',ppf3:'Streak shield',ppf4:'1.5× XP boost',ppf5:'Unlimited practice',
+    getStarted:'Get Started Free',tryFree:'Try Free → Upgrade Later',
+    logIn:'Log In',register:'Register',email:'Email',password:'Password',fullName:'Full Name',
+    username2:'Username',createAccount:'Create Free Account',
+    welcomeHanji:'Welcome to Hanji',knowChinese:'Do you already know Chinese?',
+    helpLevel:'This helps us place you at the right level.',
+    beginner:'Complete beginner',beginnerDesc:'Start from HSK 1',
+    someKnow:'I know a little',someDesc:'Know some basics',
+    testLevel:'Test my level',testDesc2:'10-question placement test',
+    continue:'Continue →',yourGoal:'Your Goal',whichHSK:'Which HSK are you targeting?',
+    changeLater:'You can change this anytime.',
+    hsk1desc:'150 words · Beginner',hsk2desc:'300 words · Elementary',
+    hsk3desc:'600 words · Intermediate',hsk4desc:'1200 words · Upper Intermediate',
+    dailyHabit:'Daily Habit',howMany:'Words per day?',sweetSpot:'10/day is the sweet spot.',
+    startLearning:'Start Learning →',placementTest:'Placement Test',
+    findLevel:"Let's find your level",tenQ:'10 quick questions.',
+    dayStreak:'Day Streak',totalXP:'Total XP',wordsKnown:'Words',
+    wordsToday:'Words Today',mastered:'Mastered',hskLevel:'HSK Level',bestStreak:'Best Streak',
+    dailyGoal:'Daily Goal',learningPath:'Your Learning Path',
+    vocabulary:'Vocabulary',allWords:'All Learned Words',
+    practiceAll:'Practice Everything',practiceAllDesc:'Review all words with rotating exercises.',
+    startPractice:'Start Practice →',all:'All',learning:'Learning',reviewing:'Reviewing',
+    globalRankings:'Rankings',leaderboard:'Leaderboard',
+    inviteFriends:'🎁 Invite Friends',inviteDesc:'Invite a friend → earn Friend badge + 100 XP!',
+    copyLink:'📋 Copy',share:'📤 Share',global:'Global',friends:'Friends',
+    findFriends:'🔍 Find Friends',search:'Search',findNearby:'📍 Find Nearby',findContacts:'📱 From Contacts',
+    editProfile:'Edit Profile',displayName:'Display Name',bio:'Bio',country:'Country',
+    saveChanges:'Save Changes',logOut:'Log Out',
+    hskScores:'HSK Test Scores (out of 300)',appLanguage:'App Language',
+    langNote:'Changes all labels. Learning content stays in Chinese.',
+    usernameLimit:'Can be changed 2 times per month.',
+    dailyGoalSetting:'Daily Word Goal',following:'Following',
+    notFollowing:'Not following anyone yet. Find people in Rankings!',
+    badges:'Badges & Achievements',xp:'XP',streak:'Streak',words:'Words',
+    advertisement:'Advertisement',adMsg:'Ad space — upgrade Super Hanji to remove',
+    removeAds:'Remove Ads →',unlockSuper:'Unlock Super Hanji',
+    superDesc:'Reach your HSK goal 2× faster',superSubDesc:'Reach your HSK goal 2× faster',
+    noAds:'No ads ever',mockExams:'Full HSK mock exams',streakShield:'Streak shield',
+    xpBoost:'XP boost',unlimitedPrac:'Unlimited practice',
+    yearlyDeal:'¥99/year — save 41%',joinWaitlist:'Join Waitlist →',comingSoon:'Payments launching soon.',
+    dashboard:'Dashboard',nextLesson:'Next Lesson →',
+    follow:'Follow',following2:'Following',viewProfile:'View Profile',
+    almost:'Almost There',almostSub:'Review the words and try again.',
+    reviewWords:'Review Words',retryTest:'Retry Test',
+    // Exercise prompts — translated
+    ex_what_mean:'What does {char} mean?',
+    ex_which_char:'Which character means: "{word}"?',
+    ex_fill_blank:'Fill in the blank:',
+    ex_correct:'✅ Correct!',ex_wrong:'❌ Not quite.',
+    ex_grammar_mc:'Multiple choice:',
+    // Psychology messages
+    psych_streak_risk:'⚠️ Don\'t break your streak!',
+    psych_streak_risk_sub:'You haven\'t studied today. Your {n}-day streak is at risk!',
+    psych_goal_close:'Almost at your daily goal!',
+    psych_goal_close_sub:'Just {n} more words to hit today\'s goal!',
+    psych_friend_ahead:'Your friend {name} is pulling ahead!',
+    psych_friend_ahead_sub:'They just earned {xp} XP. Don\'t fall behind!',
+    psych_comeback:'Welcome back!',
+    psych_comeback_sub:'You lost your streak but you\'re here now. Start fresh — every day is day one.',
+    psych_milestone:'You know {n} words!',
+    psych_milestone_sub:'You\'re {pct}% of the way to HSK {lv}. Keep going!',
+    psych_weekly:'Weekly summary:',
+    psych_weekly_sub:'This week you learned {w} words and earned {xp} XP.',
+  },
+  ru:{
+    home:'Главная',vocab:'Слова',rankings:'Рейтинг',profile:'Профиль',
+    hsk16:'HSK 1–6',heroTitle:'Сдай HSK быстрее с Hanji',
+    heroSub:'Ежедневные уроки для подготовки к HSK.',
+    startFree:'Начать бесплатно →',seeRankings:'Рейтинг',
+    howWorks:'Как это работает',oneLoop:'Один цикл. До мастерства.',
+    learn:'Учить',practice:'Практика',testAdvance:'Тест и прогресс',
+    learnDesc:'Словарь и грамматика с объяснениями.',
+    practiceDesc:'6+ типов упражнений. Никогда одинаково.',
+    testDesc:'80% для перехода. Ошибся — целевая практика.',
+    pricing:'Цены',pricingTitle:'Бесплатно для старта.',
+    free:'Бесплатно',forever:'/ навсегда',freeDesc:'Полный доступ к урокам.',
+    pf1:'Уроки HSK 1–6',pf2:'Серии и XP',pf3:'Реклама после уроков',pf4:'Нет пробных экзаменов',
+    bestValue:'Лучшее предложение',perMonth:'/ месяц',premiumDesc:'¥99/год — экономия 41%.',
+    ppf1:'Без рекламы',ppf2:'Пробные экзамены HSK',ppf3:'Защита серии',ppf4:'Буст 1.5× XP',ppf5:'Безлимитная практика',
+    getStarted:'Начать бесплатно',tryFree:'Попробовать бесплатно',
+    logIn:'Войти',register:'Регистрация',email:'Эл. почта',password:'Пароль',
+    fullName:'Полное имя',username2:'Имя пользователя',createAccount:'Создать аккаунт',
+    welcomeHanji:'Добро пожаловать в Hanji',knowChinese:'Знаешь ли ты китайский?',
+    helpLevel:'Поможет определить твой уровень.',
+    beginner:'Полный новичок',beginnerDesc:'С HSK 1',
+    someKnow:'Немного знаю',someDesc:'Знаю основы',
+    testLevel:'Проверить уровень',testDesc2:'10 вопросов',
+    continue:'Продолжить →',yourGoal:'Твоя цель',whichHSK:'Какой HSK?',
+    changeLater:'Можно изменить позже.',
+    hsk1desc:'150 слов',hsk2desc:'300 слов',hsk3desc:'600 слов',hsk4desc:'1200 слов',
+    dailyHabit:'Привычка',howMany:'Слов в день?',sweetSpot:'10/день — оптимально.',
+    startLearning:'Начать →',placementTest:'Тест на уровень',
+    findLevel:'Определим уровень',tenQ:'10 вопросов.',
+    dayStreak:'Серия дней',totalXP:'Всего XP',wordsKnown:'Слова',
+    wordsToday:'Сегодня',mastered:'Освоено',hskLevel:'Уровень HSK',bestStreak:'Рекорд',
+    dailyGoal:'Цель дня',learningPath:'Путь обучения',
+    vocabulary:'Словарь',allWords:'Все слова',
+    practiceAll:'Практиковать всё',practiceAllDesc:'Повторяй всё с разными упражнениями.',
+    startPractice:'Начать практику →',all:'Все',learning:'Учу',reviewing:'Повторяю',
+    globalRankings:'Рейтинг',leaderboard:'Таблица лидеров',
+    inviteFriends:'🎁 Пригласить',inviteDesc:'Пригласи → значок + 100 XP!',
+    copyLink:'📋 Скопировать',share:'📤 Поделиться',global:'Глобально',friends:'Друзья',
+    findFriends:'🔍 Найти друзей',search:'Найти',findNearby:'📍 Рядом',findContacts:'📱 Контакты',
+    editProfile:'Редактировать',displayName:'Имя',bio:'О себе',country:'Страна',
+    saveChanges:'Сохранить',logOut:'Выйти',
+    hskScores:'Результаты HSK (из 300)',appLanguage:'Язык приложения',
+    langNote:'Меняет кнопки. Учебный контент остаётся на китайском.',
+    usernameLimit:'Можно изменить 2 раза в месяц.',
+    dailyGoalSetting:'Цель по словам',following:'Подписки',
+    notFollowing:'Нет подписок. Найди людей в Рейтинге!',
+    badges:'Значки',xp:'XP',streak:'Серия',words:'Слова',
+    advertisement:'Реклама',adMsg:'Реклама — обновись для удаления',
+    removeAds:'Убрать →',unlockSuper:'Разблокировать Super Hanji',
+    superDesc:'Достигни HSK в 2× быстрее',superSubDesc:'В 2× быстрее',
+    noAds:'Без рекламы',mockExams:'Пробные экзамены',streakShield:'Защита серии',
+    xpBoost:'Буст XP',unlimitedPrac:'Безлимитная практика',
+    yearlyDeal:'¥99/год — 41% скидка',joinWaitlist:'В список ожидания →',comingSoon:'Скоро.',
+    dashboard:'Главная',nextLesson:'Следующий урок →',
+    follow:'Подписаться',following2:'Отписаться',viewProfile:'Профиль',
+    almost:'Почти!',almostSub:'Повтори и попробуй снова.',
+    reviewWords:'Повторить',retryTest:'Ещё раз',
+    ex_what_mean:'Что означает {char}?',
+    ex_which_char:'Какой иероглиф означает «{word}»?',
+    ex_fill_blank:'Заполни пропуск:',
+    ex_correct:'✅ Верно!',ex_wrong:'❌ Неверно.',ex_grammar_mc:'Выбери ответ:',
+    psych_streak_risk:'⚠️ Не теряй серию!',
+    psych_streak_risk_sub:'Ты ещё не занимался сегодня. Серия {n} дней под угрозой!',
+    psych_goal_close:'Почти достиг цели!',
+    psych_goal_close_sub:'Ещё {n} слова до цели дня!',
+    psych_friend_ahead:'Твой друг {name} обгоняет!',
+    psych_friend_ahead_sub:'Он заработал {xp} XP. Не отставай!',
+    psych_comeback:'С возвращением!',
+    psych_comeback_sub:'Серия прервана, но ты здесь. Начни заново — каждый день это первый день.',
+    psych_milestone:'Ты знаешь {n} слов!',
+    psych_milestone_sub:'Ты прошёл {pct}% пути к HSK {lv}.',
+    psych_weekly:'Итоги недели:',
+    psych_weekly_sub:'На этой неделе ты выучил {w} слов и заработал {xp} XP.',
+  },
+  tk:{
+    home:'Baş sahypa',vocab:'Sözler',rankings:'Sanaw',profile:'Profil',
+    hsk16:'HSK 1–6',heroTitle:'Hanji bilen HSK-ny çalt geç',
+    heroSub:'HSK üçin gündelik gysga sapaklar.',
+    startFree:'Mugt başla →',seeRankings:'Sanawa bak',
+    howWorks:'Nähili işleýär',oneLoop:'Bir aýlaw. Ussatlyk ýetýänçä.',
+    learn:'Öwren',practice:'Türgenleş',testAdvance:'Synag we ilerle',
+    learnDesc:'Sözler we grammatika, düşündiriş we mysallar bilen.',
+    practiceDesc:'6+ dürli türgenleşik. Hiç haçan birmeňzeş däl.',
+    testDesc:'80% geçmek üçin. Şowsuz bolsaň — yzlaşan türgenleşik.',
+    pricing:'Bahalar',pricingTitle:'Başlamak mugt.',
+    free:'Mugt',forever:'/ hemişe',freeDesc:'Ähli derejelerde doly sapaklar.',
+    pf1:'HSK 1–6 sapaklar',pf2:'Yzygiderlilik we XP',pf3:'Sapaklardan soň reklama',pf4:'Synag ýok',
+    bestValue:'Iň gowy teklip',perMonth:'/ aý',premiumDesc:'¥99/ýyl — 41% tygşytla',
+    ppf1:'Reklama ýok',ppf2:'HSK synag synaglary',ppf3:'Yzygiderlilik goragy',ppf4:'1.5× XP',ppf5:'Çäksiz türgenleşik',
+    getStarted:'Mugt başla',tryFree:'Mugt synap gör',
+    logIn:'Giriş',register:'Hasap aç',email:'E-poçta',password:'Parol',
+    fullName:'Doly ady',username2:'Ulanyjy ady',createAccount:'Mugt hasap aç',
+    welcomeHanji:"Hanji'ä hoş geldiňiz",knowChinese:'Hytaýça bilýärsiňizmi?',
+    helpLevel:'Derejeňizi anyklamaga kömek edýär.',
+    beginner:'Doly başlangyç',beginnerDesc:'HSK 1-den başla',
+    someKnow:'Biraz bilýärin',someDesc:'Esaslaryny bilýärin',
+    testLevel:'Derejämi synala',testDesc2:'10 sorag',
+    continue:'Dowam et →',yourGoal:'Maksatyň',whichHSK:'Haýsy HSK?',
+    changeLater:'Islän wagtyň üýtgedip bilersiň.',
+    hsk1desc:'150 söz',hsk2desc:'300 söz',hsk3desc:'600 söz',hsk4desc:'1200 söz',
+    dailyHabit:'Gündelik endik',howMany:'Günde näçe söz?',sweetSpot:'Günde 10 söz iň optimal.',
+    startLearning:'Öwrenip başla →',placementTest:'Dereje synasy',
+    findLevel:'Derejeňizi tapalyk',tenQ:'10 sorag.',
+    dayStreak:'Yzygiderlilik',totalXP:'Jemi XP',wordsKnown:'Sözler',
+    wordsToday:'Şu gün',mastered:'Özleşdirilen',hskLevel:'HSK derejesi',bestStreak:'Rekord',
+    dailyGoal:'Gündelik maksat',learningPath:'Öwreniş ýoly',
+    vocabulary:'Sözlük',allWords:'Öwrenilen sözler',
+    practiceAll:'Ählisini türgenleş',practiceAllDesc:'Dürli türgenleşikler bilen gaýtala.',
+    startPractice:'Türgenleşik başlat →',all:'Ählisi',learning:'Öwrenýän',reviewing:'Gaýtalaýan',
+    globalRankings:'Sanaw',leaderboard:'Liderler',
+    inviteFriends:'🎁 Dost çagyr',inviteDesc:'Çagyr → nyşan + 100 XP!',
+    copyLink:'📋 Göçür',share:'📤 Paýlaş',global:'Global',friends:'Dostlar',
+    findFriends:'🔍 Dost tap',search:'Gözle',findNearby:'📍 Golaýdaky',findContacts:'📱 Kontaktlar',
+    editProfile:'Profili düzelt',displayName:'Görkezme ady',bio:'Maglumat',country:'Ýurt',
+    saveChanges:'Sakla',logOut:'Çyk',
+    hskScores:'HSK bal (300-den)',appLanguage:'Programma dili',
+    langNote:'Bellikler üýtgeýär. Mazmuny hytaý dilinde galýar.',
+    usernameLimit:'Aýda 2 gezek üýtgedip bolýar.',
+    dailyGoalSetting:'Gündelik maksat',following:'Yzarlanýanlar',
+    notFollowing:'Heniz hiç kimi yzarlamaýarsyň.',
+    badges:'Nyşanlar',xp:'XP',streak:'Yzygiderlilik',words:'Sözler',
+    advertisement:'Reklama',adMsg:"Reklama — Super Hanji al",
+    removeAds:'Aýyr →',unlockSuper:'Super Hanji aç',
+    superDesc:'2× çalt ýet',superSubDesc:'2× çalt',
+    noAds:'Reklama ýok',mockExams:'Synag synaglary',streakShield:'Yzygiderlilik goragy',
+    xpBoost:'XP artdyrma',unlimitedPrac:'Çäksiz',
+    yearlyDeal:'¥99/ýyl — 41% tygşytla',joinWaitlist:'Garaşma sanawyna →',comingSoon:'Basym.',
+    dashboard:'Baş sahypa',nextLesson:'Indiki sapak →',
+    follow:'Yzarla',following2:'Yzarlamagy bes et',viewProfile:'Profil',
+    almost:'Az galdy!',almostSub:'Gaýtalaň we täzeden synanyşyň.',
+    reviewWords:'Gaýtala',retryTest:'Täzeden',
+    ex_what_mean:'{char} näme diýmek?',
+    ex_which_char:'"{word}" haýsy harp?',
+    ex_fill_blank:'Boşlugy doldur:',
+    ex_correct:'✅ Dogry!',ex_wrong:'❌ Nädogry.',ex_grammar_mc:'Saýla:',
+    psych_streak_risk:'⚠️ Yzygiderliligini ýitirme!',
+    psych_streak_risk_sub:'Şu gün heniz okamadyň. {n} günlük yzygiderlilik howp astynda!',
+    psych_goal_close:'Maksada ýakynlaşýarsyň!',
+    psych_goal_close_sub:'Gündelik maksat üçin ýene {n} söz!',
+    psych_friend_ahead:'Dostuň {name} öňde!',
+    psych_friend_ahead_sub:'Ol {xp} XP gazandy. Yza galma!',
+    psych_comeback:'Hoş geldiňiz!',
+    psych_comeback_sub:'Yzygiderlilik kesildi, ýöne sen şu ýerdesin. Täzeden başla.',
+    psych_milestone:'{n} söz bilýärsiň!',
+    psych_milestone_sub:'HSK {lv} üçin {pct}% geçdiň.',
+    psych_weekly:'Hepdelik netijeler:',
+    psych_weekly_sub:'Bu hepde {w} söz öwrendiň we {xp} XP gazandyň.',
+  }
+};
+let curLang=localStorage.getItem('hanji-lang')||'en';
+function t(key,vars={}){
+  let str=(LANGS[curLang]||LANGS.en)[key]||(LANGS.en[key]||key);
+  Object.keys(vars).forEach(k=>{str=str.replace('{'+k+'}',vars[k]);});
+  return str;
+}
+function applyLang(){
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const k=el.getAttribute('data-t');
+    const txt=t(k);
+    if(txt)el.textContent=txt;
+  });
+}
+
+// ============================================================
+// HSK 1 VOCABULARY (50 words)
+// ============================================================
+const W={
+  w01:{ch:'你好',py:'nǐ hǎo',en:'Hello',pos:'greeting',usage:'Standard greeting. Formal: 您好 (nín hǎo).',ex:[{cn:'你好！',py:'Nǐ hǎo!',en:'Hello!'},{cn:'老师，你好！',py:'Lǎoshī nǐ hǎo!',en:'Hello, teacher!'}]},
+  w02:{ch:'谢谢',py:'xiè xie',en:'Thank you',pos:'expression',usage:'Gratitude. Reply: 不客气 (you\'re welcome). Stronger: 非常谢谢.',ex:[{cn:'谢谢你的帮助！',py:'Xiè xie nǐ de bāngzhù!',en:'Thanks for your help!'},{cn:'不客气！',py:'Bú kèqi!',en:"You're welcome!"}]},
+  w03:{ch:'对不起',py:'duì bu qǐ',en:'Sorry / Excuse me',pos:'expression',usage:'Apology. Reply: 没关系 (never mind).',ex:[{cn:'对不起，我来晚了。',py:'Duì bu qǐ wǒ lái wǎn le.',en:"Sorry, I'm late."},{cn:'没关系！',py:'Méi guānxi!',en:'No worries!'}]},
+  w04:{ch:'我',py:'wǒ',en:'I / Me',pos:'pronoun',usage:'1st person. 我们=we.',ex:[{cn:'我是学生。',py:'Wǒ shì xuésheng.',en:'I am a student.'},{cn:'我喜欢中文。',py:'Wǒ xǐhuān Zhōngwén.',en:'I like Chinese.'}]},
+  w05:{ch:'你',py:'nǐ',en:'You',pos:'pronoun',usage:'Informal "you". Formal: 您. Plural: 你们.',ex:[{cn:'你好吗？',py:'Nǐ hǎo ma?',en:'How are you?'},{cn:'你叫什么名字？',py:'Nǐ jiào shénme míngzi?',en:'What is your name?'}]},
+  w06:{ch:'他',py:'tā',en:'He / Him',pos:'pronoun',usage:'Male. All three (他她它) sound identical as "tā"!',ex:[{cn:'他是我的朋友。',py:'Tā shì wǒ de péngyǒu.',en:'He is my friend.'},{cn:'他很高。',py:'Tā hěn gāo.',en:'He is tall.'}]},
+  w07:{ch:'她',py:'tā',en:'She / Her',pos:'pronoun',usage:'Female. Same pronunciation as 他. Context determines meaning.',ex:[{cn:'她是老师。',py:'Tā shì lǎoshī.',en:'She is a teacher.'},{cn:'她很漂亮。',py:'Tā hěn piàoliang.',en:'She is pretty.'}]},
+  w08:{ch:'是',py:'shì',en:'To be (am/is/are)',pos:'verb',usage:'Links subject to noun. NEVER before adjectives! 不是=negation.',ex:[{cn:'我是老师。',py:'Wǒ shì lǎoshī.',en:'I am a teacher.'},{cn:'你是学生吗？',py:'Nǐ shì xuésheng ma?',en:'Are you a student?'}]},
+  w09:{ch:'不',py:'bù/bú',en:'Not / No',pos:'adverb',usage:'Main negation. Tone: bú before 4th tone (不是=bú shì).',ex:[{cn:'我不是学生。',py:'Wǒ bú shì xuésheng.',en:"I'm not a student."},{cn:'我不喜欢咖啡。',py:'Wǒ bù xǐhuān kāfēi.',en:"I don't like coffee."}]},
+  w10:{ch:'好',py:'hǎo',en:'Good / Fine / OK',pos:'adjective',usage:'很好(very good), 好的(OK), 好吃(delicious), 好看(pretty).',ex:[{cn:'今天天气很好。',py:'Jīntiān tiānqì hěn hǎo.',en:'Good weather today.'},{cn:'好的，没问题。',py:'Hǎo de méi wèntí.',en:'OK, no problem.'}]},
+  w11:{ch:'有',py:'yǒu',en:'Have / There is',pos:'verb',usage:'Means both "to have" AND "there is". Negate: 没有 (NEVER 不有)!',ex:[{cn:'我有一个姐姐。',py:'Wǒ yǒu yīgè jiějie.',en:'I have a sister.'},{cn:'这里有咖啡吗？',py:'Zhèlǐ yǒu kāfēi ma?',en:'Is there coffee here?'}]},
+  w12:{ch:'没有',py:'méi yǒu',en:"Don't have / There isn't",pos:'verb',usage:'ONLY way to negate 有. Never say 不有!',ex:[{cn:'我没有钱。',py:'Wǒ méi yǒu qián.',en:"I don't have money."},{cn:'这里没有人。',py:'Zhèlǐ méi yǒu rén.',en:'No one here.'}]},
+  w13:{ch:'吃',py:'chī',en:'To eat',pos:'verb',usage:'"Have you eaten?" (你吃饭了吗?) is a common greeting!',ex:[{cn:'你吃饭了吗？',py:'Nǐ chī fàn le ma?',en:'Have you eaten?'},{cn:'我喜欢吃中国菜。',py:'Wǒ xǐhuān chī Zhōngguó cài.',en:'I like Chinese food.'}]},
+  w14:{ch:'喝',py:'hē',en:'To drink',pos:'verb',usage:'喝水(water), 喝茶(tea), 喝咖啡(coffee).',ex:[{cn:'我喜欢喝茶。',py:'Wǒ xǐhuān hē chá.',en:'I like tea.'},{cn:'你喝什么？',py:'Nǐ hē shénme?',en:'What do you drink?'}]},
+  w15:{ch:'去',py:'qù',en:'To go',pos:'verb',usage:'Subject + 去 + Place. Opposite: 来 (come).',ex:[{cn:'我要去学校。',py:'Wǒ yào qù xuéxiào.',en:'I want to go to school.'},{cn:'你去哪里？',py:'Nǐ qù nǎlǐ?',en:'Where are you going?'}]},
+  w16:{ch:'来',py:'lái',en:'To come',pos:'verb',usage:'Movement toward speaker. Opposite: 去.',ex:[{cn:'你来我家吧。',py:'Nǐ lái wǒ jiā ba.',en:'Come to my home.'},{cn:'欢迎来中国！',py:'Huānyíng lái Zhōngguó!',en:'Welcome to China!'}]},
+  w17:{ch:'学习',py:'xué xí',en:'To study',pos:'verb',usage:'好好学习，天天向上 (Study well, improve daily!).',ex:[{cn:'我每天学习中文。',py:'Wǒ měitiān xuéxí Zhōngwén.',en:'I study Chinese daily.'},{cn:'你喜欢学习吗？',py:'Nǐ xǐhuān xuéxí ma?',en:'Do you like studying?'}]},
+  w18:{ch:'喜欢',py:'xǐ huān',en:'To like',pos:'verb',usage:'Subject + 喜欢 + verb/noun. Negate: 不喜欢.',ex:[{cn:'我喜欢学中文。',py:'Wǒ xǐhuān xué Zhōngwén.',en:'I like Chinese.'},{cn:'你喜欢什么颜色？',py:'Nǐ xǐhuān shénme yánsè?',en:'What color do you like?'}]},
+  w19:{ch:'今天',py:'jīn tiān',en:'Today',pos:'noun',usage:'昨天(yesterday) → 今天(today) → 明天(tomorrow). Consistent!',ex:[{cn:'今天天气怎么样？',py:'Jīntiān tiānqì zěnmeyàng?',en:'Weather today?'},{cn:'今天我很忙。',py:'Jīntiān wǒ hěn máng.',en:'I am busy today.'}]},
+  w20:{ch:'朋友',py:'péng yǒu',en:'Friend',pos:'noun',usage:'男朋友=boyfriend, 女朋友=girlfriend!',ex:[{cn:'他是我最好的朋友。',py:'Tā shì wǒ zuì hǎo de péngyǒu.',en:'My best friend.'},{cn:'你有很多朋友吗？',py:'Nǐ yǒu hěn duō péngyǒu ma?',en:'Many friends?'}]},
+  w21:{ch:'什么',py:'shén me',en:'What',pos:'question',usage:'Question words stay in place: 你叫什么名字?',ex:[{cn:'这是什么？',py:'Zhè shì shénme?',en:'What is this?'},{cn:'你叫什么名字？',py:'Nǐ jiào shénme míngzi?',en:'What is your name?'}]},
+  w22:{ch:'可以',py:'kě yǐ',en:'Can / May',pos:'modal',usage:'Permission. vs 能(ability) vs 会(skill).',ex:[{cn:'我可以进来吗？',py:'Wǒ kěyǐ jìnlái ma?',en:'May I come in?'},{cn:'可以，没问题。',py:'Kěyǐ méi wèntí.',en:'Sure, no problem.'}]},
+  w23:{ch:'要',py:'yào',en:'Want / Will',pos:'modal',usage:'3 uses: want/will/must. 不要 = don\'t!',ex:[{cn:'我要一杯咖啡。',py:'Wǒ yào yī bēi kāfēi.',en:'I want a coffee.'},{cn:'你要去哪里？',py:'Nǐ yào qù nǎlǐ?',en:'Where will you go?'}]},
+  w24:{ch:'大',py:'dà',en:'Big',pos:'adjective',usage:'Opposite: 小. 大学=university, 大家=everyone.',ex:[{cn:'这个房间很大。',py:'Zhège fángjiān hěn dà.',en:'This room is big.'},{cn:'上海是大城市。',py:'Shànghǎi shì dà chéngshì.',en:'Shanghai is a big city.'}]},
+  w25:{ch:'小',py:'xiǎo',en:'Small',pos:'adjective',usage:'小心!=Be careful! (lit: small heart). Term of endearment.',ex:[{cn:'我有一只小猫。',py:'Wǒ yǒu yī zhī xiǎo māo.',en:'I have a small cat.'},{cn:'小心！',py:'Xiǎoxīn!',en:'Be careful!'}]},
+  w26:{ch:'多少',py:'duō shǎo',en:'How many/much',pos:'question',usage:'多少钱? = How much? Key shopping phrase!',ex:[{cn:'这个多少钱？',py:'Zhège duōshǎo qián?',en:'How much?'},{cn:'你有多少朋友？',py:'Nǐ yǒu duōshǎo péngyǒu?',en:'How many friends?'}]},
+  w27:{ch:'钱',py:'qián',en:'Money',pos:'noun',usage:'Chinese currency: 元(yuán). Colloquial: 块(kuài).',ex:[{cn:'这个多少钱？',py:'Zhège duōshǎo qián?',en:'How much?'},{cn:'我没有钱。',py:'Wǒ méi yǒu qián.',en:"No money."}]},
+  w28:{ch:'说',py:'shuō',en:'To speak',pos:'verb',usage:'说话=talk, 说中文=speak Chinese.',ex:[{cn:'你会说中文吗？',py:'Nǐ huì shuō Zhōngwén ma?',en:'Do you speak Chinese?'},{cn:'请说慢一点。',py:'Qǐng shuō màn yīdiǎn.',en:'Speak slower please.'}]},
+  w29:{ch:'看',py:'kàn',en:'To look/watch',pos:'verb',usage:'看书(read), 看电视(watch TV), 看医生(see doctor).',ex:[{cn:'我喜欢看电视。',py:'Wǒ xǐhuān kàn diànshì.',en:'I like watching TV.'},{cn:'你看一下！',py:'Nǐ kàn yīxià!',en:'Take a look!'}]},
+  w30:{ch:'听',py:'tīng',en:'To listen',pos:'verb',usage:'听音乐(music), 听说(heard that).',ex:[{cn:'我喜欢听音乐。',py:'Wǒ xǐhuān tīng yīnyuè.',en:'I like music.'},{cn:'听说你会说中文。',py:'Tīngshuō nǐ huì shuō Zhōngwén.',en:"I heard you speak Chinese."}]},
+  w31:{ch:'写',py:'xiě',en:'To write',pos:'verb',usage:'写字=write characters, 写作=writing.',ex:[{cn:'请写你的名字。',py:'Qǐng xiě nǐ de míngzi.',en:'Write your name.'},{cn:'汉字很难写。',py:'Hànzì hěn nán xiě.',en:'Characters are hard to write.'}]},
+  w32:{ch:'读',py:'dú',en:'To read (aloud)',pos:'verb',usage:'读书=study. 看书=read for fun.',ex:[{cn:'请大声读。',py:'Qǐng dàshēng dú.',en:'Read aloud.'},{cn:'我在读一本书。',py:'Wǒ zài dú yī běn shū.',en:'I am reading a book.'}]},
+  w33:{ch:'年',py:'nián',en:'Year',pos:'noun',usage:'今年/明年/去年. 新年快乐!',ex:[{cn:'新年快乐！',py:'Xīnnián kuàilè!',en:'Happy New Year!'},{cn:'我在这里三年了。',py:'Wǒ zài zhèlǐ sān nián le.',en:'3 years here.'}]},
+  w34:{ch:'月',py:'yuè',en:'Month / Moon',pos:'noun',usage:'月 means both month AND moon! Months: 一月, 二月...',ex:[{cn:'这个月我很忙。',py:'Zhège yuè wǒ hěn máng.',en:'Busy this month.'},{cn:'月亮很美。',py:'Yuèliàng hěn měi.',en:'Beautiful moon.'}]},
+  w35:{ch:'日',py:'rì',en:'Day / Sun',pos:'noun',usage:'生日=birthday. Dates: 十五日 or 十五号.',ex:[{cn:'生日快乐！',py:'Shēngrì kuàilè!',en:'Happy birthday!'},{cn:'今天是几号？',py:'Jīntiān shì jǐ hào?',en:'What date today?'}]},
+  w36:{ch:'上',py:'shàng',en:'Up / On / Above',pos:'directional',usage:'上面(above), 上课(class starts), 上网(online), 马上(immediately).',ex:[{cn:'书在桌子上。',py:'Shū zài zhuōzi shàng.',en:'Book is on the table.'},{cn:'上课了！',py:'Shàng kè le!',en:'Class starts!'}]},
+  w37:{ch:'下',py:'xià',en:'Down / Under',pos:'directional',usage:'下课(class ends), 下雨(raining), 下载(download).',ex:[{cn:'猫在桌子下面。',py:'Māo zài zhuōzi xiàmiàn.',en:'Cat under table.'},{cn:'下课了！',py:'Xià kè le!',en:'Class is over!'}]},
+  w38:{ch:'中',py:'zhōng',en:'Middle / Center',pos:'directional',usage:'中国(China), 中文(Chinese), 中间(between), 中午(noon).',ex:[{cn:'书在中间。',py:'Shū zài zhōngjiān.',en:'Book in the middle.'},{cn:'我学中文。',py:'Wǒ xué Zhōngwén.',en:'I study Chinese.'}]},
+  w39:{ch:'人',py:'rén',en:'Person / People',pos:'noun',usage:'中国人(Chinese), 美国人(American). 大人=adult.',ex:[{cn:'那个人是谁？',py:'Nàgè rén shì shéi?',en:'Who is that?'},{cn:'这里有很多人。',py:'Zhèlǐ yǒu hěn duō rén.',en:'Many people here.'}]},
+  w40:{ch:'中国',py:'Zhōng guó',en:'China',pos:'noun',usage:'中=middle, 国=country. The "Middle Kingdom".',ex:[{cn:'我来自中国。',py:'Wǒ láizì Zhōngguó.',en:'I am from China.'},{cn:'中国很大。',py:'Zhōngguó hěn dà.',en:'China is very big.'}]},
+  w41:{ch:'学生',py:'xué sheng',en:'Student',pos:'noun',usage:'学=study, 生=life. 大学生=university student.',ex:[{cn:'我是大学生。',py:'Wǒ shì dàxuésheng.',en:'University student.'},{cn:'班里有二十个学生。',py:'Bān lǐ yǒu èrshí gè xuésheng.',en:'20 students in class.'}]},
+  w42:{ch:'老师',py:'lǎo shī',en:'Teacher',pos:'noun',usage:'老(experienced)+师(master). Address as 老师!',ex:[{cn:'我的老师很好。',py:'Wǒ de lǎoshī hěn hǎo.',en:'My teacher is great.'},{cn:'老师，我有问题。',py:'Lǎoshī wǒ yǒu wèntí.',en:'Teacher, I have a question.'}]},
+  w43:{ch:'一',py:'yī',en:'One (1)',pos:'number',usage:'Tone changes: yí before 4th tone, yì before 1st/2nd/3rd.',ex:[{cn:'我有一个问题。',py:'Wǒ yǒu yīgè wèntí.',en:'I have one question.'},{cn:'请等一下。',py:'Qǐng děng yīxià.',en:'Wait a moment.'}]},
+  w44:{ch:'二',py:'èr',en:'Two (2)',pos:'number',usage:'二 for counting; 两 before measure words (两个人 NOT 二个人)!',ex:[{cn:'第二个问题。',py:'Dì èr gè wèntí.',en:'The second question.'},{cn:'我有两个姐姐。',py:'Wǒ yǒu liǎng gè jiějie.',en:'Two sisters.'}]},
+  w45:{ch:'三',py:'sān',en:'Three (3)',pos:'number',usage:'Lucky number! 三思而后行 (think thrice before acting).',ex:[{cn:'我有三个孩子。',py:'Wǒ yǒu sān gè háizi.',en:'I have three kids.'},{cn:'三天后。',py:'Sān tiān hòu.',en:'Three days later.'}]},
+  w46:{ch:'水',py:'shuǐ',en:'Water',pos:'noun',usage:'Water radical 氵appears in hundreds of characters.',ex:[{cn:'请给我一杯水。',py:'Qǐng gěi wǒ yī bēi shuǐ.',en:'Water please.'},{cn:'中国人喜欢喝热水。',py:'Zhōngguó rén xǐhuān hē rè shuǐ.',en:'Chinese people like hot water.'}]},
+  w47:{ch:'这',py:'zhè',en:'This',pos:'demonstrative',usage:'Near speaker. 这个(this one), 这里(here), 这些(these).',ex:[{cn:'这是我的书。',py:'Zhè shì wǒ de shū.',en:'This is my book.'},{cn:'这个多少钱？',py:'Zhège duōshǎo qián?',en:'How much is this?'}]},
+  w48:{ch:'那',py:'nà',en:'That',pos:'demonstrative',usage:'Far from speaker. 那个(that one), 那里(there).',ex:[{cn:'那是什么？',py:'Nà shì shénme?',en:'What is that?'},{cn:'那个人是谁？',py:'Nàgè rén shì shéi?',en:'Who is that?'}]},
+  w49:{ch:'哪',py:'nǎ',en:'Which / Where',pos:'question',usage:'哪里=where, 哪个=which one.',ex:[{cn:'你是哪国人？',py:'Nǐ shì nǎ guó rén?',en:'What country?'},{cn:'哪里有厕所？',py:'Nǎlǐ yǒu cèsuǒ?',en:'Where is the bathroom?'}]},
+  w50:{ch:'明天',py:'míng tiān',en:'Tomorrow',pos:'noun',usage:'明=bright/next. 明年=next year.',ex:[{cn:'明天见！',py:'Míngtiān jiàn!',en:'See you tomorrow!'},{cn:'明天有考试。',py:'Míngtiān yǒu kǎoshì.',en:'Test tomorrow.'}]},
+};
+
+// Grammar lessons
+const GRAM={
+  g01:{id:'g01',title:'是 (shì) — To Be',pattern:'Subject + 是 + Noun',explanation:'Links subject to noun for identity. NEVER before adjectives!',rules:[{title:'Identity',desc:'我是学生 ✓ — 是 connects subject to noun/category.'},{title:'NOT adjectives',desc:'我很好 ✓ / 我是很好 ✗ — Adjectives go directly with 很.'},{title:'Negate',desc:'不是: 他不是老师 (He is not a teacher).'}],examples:[{cn:'我是中国人。',py:'Wǒ shì Zhōngguó rén.',en:'I am Chinese.'},{cn:'这是我的书。',py:'Zhè shì wǒ de shū.',en:'This is my book.'}]},
+  g02:{id:'g02',title:'不 vs 没 — Negation',pattern:'不+verb/adj | 没+有',explanation:'Two negation words. Mixing them is the #1 beginner mistake!',rules:[{title:'不 (bù)',desc:'Negates most verbs and adjectives: 我不喜欢, 不好.'},{title:'没 (méi)',desc:'ONLY negates 有: 我没有钱. NEVER say 不有!'},{title:'Tone',desc:'不 is bù normally, bú before 4th tone: 不是=bú shì.'}],examples:[{cn:'我不喜欢辣的。',py:'Wǒ bù xǐhuān là de.',en:"I don't like spicy."},{cn:'我没有时间。',py:'Wǒ méiyǒu shíjiān.',en:"No time."}]},
+  g03:{id:'g03',title:'的 (de) — Possession',pattern:"Owner + 的 + Noun",explanation:'Shows possession, like "\'s" in English.',rules:[{title:'Possession',desc:'我的书=my book, 他的朋友=his friend.'},{title:'Adj modifier',desc:'漂亮的女孩=beautiful girl. Adj+的+noun.'},{title:'Dropped',desc:'With pronouns+close relationships: 我妈妈 (not 我的妈妈).'}],examples:[{cn:'这是我的书。',py:'Zhè shì wǒ de shū.',en:'This is my book.'},{cn:'她的朋友很好。',py:'Tā de péngyǒu hěn hǎo.',en:"Her friend is nice."}]},
+};
+
+// Learning path HSK 1-6
+const PATH={
+  1:[
+    {id:'s1_1',title:'Greetings',icon:'👋',words:['w01','w02','w03'],xp:50,type:'vocab',desc:'3 words'},
+    {id:'s1_g1',title:'是 — To Be',icon:'📐',gramId:'g01',xp:40,type:'grammar',desc:'Grammar'},
+    {id:'s1_2',title:'Pronouns',icon:'👥',words:['w04','w05','w06','w07'],xp:60,type:'vocab',desc:'4 words'},
+    {id:'s1_3',title:'Core Verbs',icon:'⚡',words:['w08','w09','w10','w11','w12'],xp:70,type:'vocab',desc:'5 words'},
+    {id:'s1_g2',title:'不 vs 没',icon:'❌',gramId:'g02',xp:40,type:'grammar',desc:'Grammar'},
+    {id:'s1_4',title:'Daily Actions',icon:'🌅',words:['w13','w14','w15','w16'],xp:60,type:'vocab',desc:'4 words'},
+    {id:'s1_5',title:'Study & Like',icon:'📚',words:['w17','w18'],xp:50,type:'vocab',desc:'2 words'},
+    {id:'s1_g3',title:'的 — Possession',icon:'🔗',gramId:'g03',xp:40,type:'grammar',desc:'Grammar'},
+    {id:'s1_6',title:'Time & Friends',icon:'⏰',words:['w19','w20','w33','w34','w35'],xp:70,type:'vocab',desc:'5 words'},
+    {id:'s1_7',title:'Questions',icon:'❓',words:['w21','w26','w49'],xp:50,type:'vocab',desc:'3 words'},
+    {id:'s1_8',title:'Modals',icon:'🎯',words:['w22','w23'],xp:50,type:'vocab',desc:'2 words'},
+    {id:'s1_9',title:'Size & Description',icon:'🎨',words:['w24','w25'],xp:50,type:'vocab',desc:'2 words'},
+    {id:'s1_10',title:'Communication',icon:'💬',words:['w28','w29','w30','w31','w32'],xp:60,type:'vocab',desc:'5 words'},
+    {id:'s1_11',title:'Numbers & Money',icon:'🔢',words:['w43','w44','w45','w27'],xp:50,type:'vocab',desc:'4 words'},
+    {id:'s1_12',title:'Directions',icon:'🗺️',words:['w36','w37','w38','w39','w40'],xp:60,type:'vocab',desc:'5 words'},
+    {id:'s1_13',title:'Daily Life',icon:'🌏',words:['w41','w42','w46','w47','w48','w50'],xp:70,type:'vocab',desc:'6 words'},
+    {id:'s1_test',title:'HSK 1 Final Test',icon:'🏆',words:[],xp:150,type:'hsk_test',desc:'All 50 words',isTest:true},
+  ],
+  2:[
+    {id:'s2_unlock',title:'Unlock HSK 2',icon:'🔓',words:[],xp:0,type:'unlock_test',desc:'Take placement test',isUnlockTest:true},
+    {id:'s2_1',title:'HSK 2 — Coming Soon',icon:'📖',words:[],xp:80,type:'vocab',desc:'300 words total',locked_msg:'Complete HSK 1 first'},
+  ],
+  3:[{id:'s3_1',title:'HSK 3 — Coming Soon',icon:'📖',words:[],xp:100,type:'vocab',desc:'600 words total',locked_msg:'Complete HSK 2 first'}],
+  4:[{id:'s4_1',title:'HSK 4 — Coming Soon',icon:'📖',words:[],xp:120,type:'vocab',desc:'1200 words total',locked_msg:'Complete HSK 3 first'}],
+  5:[{id:'s5_1',title:'HSK 5 — Coming Soon',icon:'📖',words:[],xp:150,type:'vocab',desc:'2500 words total',locked_msg:'Complete HSK 4 first'}],
+  6:[{id:'s6_1',title:'HSK 6 — Coming Soon',icon:'📖',words:[],xp:200,type:'vocab',desc:'5000 words total',locked_msg:'Complete HSK 5 first'}],
+};
+
+const ALL_BADGES=[
+  {id:'first_word',icon:'🌱',name:'First Step',desc:'Learn your first word',cond:'words',val:1},
+  {id:'words_10',icon:'📚',name:'Word Collector',desc:'Learn 10 words',cond:'words',val:10},
+  {id:'words_50',icon:'🗂️',name:'Vocabulary Builder',desc:'Learn 50 words',cond:'words',val:50},
+  {id:'streak_3',icon:'🔥',name:'On Fire',desc:'3-day streak',cond:'streak',val:3},
+  {id:'streak_7',icon:'⚡',name:'Week Warrior',desc:'7-day streak',cond:'streak',val:7},
+  {id:'streak_30',icon:'🏆',name:'Monthly Master',desc:'30-day streak',cond:'streak',val:30},
+  {id:'hsk1_done',icon:'🎓',name:'HSK 1 Graduate',desc:'Complete HSK 1',cond:'special',val:0},
+  {id:'perfectionist',icon:'⭐',name:'Perfectionist',desc:'100% on a test',cond:'special',val:0},
+  {id:'friend_invite',icon:'👥',name:'Social Learner',desc:'Invited a friend who joined',cond:'special',val:0},
+  {id:'grammar_1',icon:'📖',name:'Grammar Explorer',desc:'Complete first grammar lesson',cond:'grammar',val:1},
+  {id:'comeback',icon:'💪',name:'Comeback Kid',desc:'Returned after missing 3+ days',cond:'special',val:0},
+];
+
+// ============================================================
+// APP STATE
+// ============================================================
+let S={
+  user:null,profile:null,
+  obChoice:null,obHSK:null,obGoal:10,
+  ptIdx:0,ptCorrect:0,
+  lessonStep:null,lessonPhase:'learn',
+  learnIdx:0,learnWords:[],
+  pracQueue:[],pracIdx:0,pracCorrect:0,
+  testQueue:[],testIdx:0,testCorrect:0,
+  profGoal:10,vocFilter:'all',userWords:[],
+  following:[],rankTab:'global',
+  permCallback:null,
+};
+
+// ============================================================
+// SUPABASE DB HELPERS
+// ============================================================
+async function getProfile(uid){
+  const{data,error}=await sb.from('profiles').select('*').eq('id',uid).single();
+  if(error)return null;
+  return data;
+}
+async function upsertProfile(uid,fields){
+  await sb.from('profiles').upsert({id:uid,...fields},{onConflict:'id'});
+}
+async function initProfile(user){
+  let p=await getProfile(user.id);
+  if(!p){
+    await sb.from('profiles').insert({
+      id:user.id,
+      full_name:user.user_metadata?.full_name||user.email.split('@')[0],
+      username:user.user_metadata?.username||'',
+      xp_points:0,daily_streak:0,longest_streak:0,
+      total_words_learned:0,daily_goal:10,hsk_level:1,
+      badges:[],subscription_tier:'free',completed_steps:[],
+      hsk_scores:{},following:[],avatar_url:null,
+      username_changes:0,username_change_month:null,
+      name_changes:0,name_change_month:null,
+    });
+    p=await getProfile(user.id);
+  }
+  return p;
+}
+async function saveWord(uid,word){
+  await sb.from('user_vocabulary').upsert({
+    user_id:uid,word_id:word.id||word.ch,
+    chinese:word.ch,pinyin:word.py,english:word.en,
+    times_correct:0,times_incorrect:0,
+    next_review_at:new Date(Date.now()+86400000).toISOString(),
+    learned_at:new Date().toISOString(),
+  },{onConflict:'user_id,word_id',ignoreDuplicates:true});
+}
+async function getUserWords(uid){
+  const{data}=await sb.from('user_vocabulary').select('*').eq('user_id',uid);
+  return data||[];
+}
+async function awardXP(uid,amount,wordsLearned=0){
+  if(!S.profile)return{earned:[]};
+  const p=S.profile;
+  const newXP=(p.xp_points||0)+amount;
+  const newWords=(p.total_words_learned||0)+wordsLearned;
+  const today=new Date().toDateString();
+  const last=p.last_study_date?new Date(p.last_study_date).toDateString():null;
+  const yest=new Date(Date.now()-86400000).toDateString();
+  let str=p.daily_streak||0,lng=p.longest_streak||0;
+  if(last!==today){str=(last===yest)?str+1:1;lng=Math.max(lng,str);}
+  const cur=Array.isArray(p.badges)?p.badges:[];
+  const earn=[...cur];const now=[];
+  const chk=(id,cond)=>{if(!cur.includes(id)&&cond){earn.push(id);now.push(id);}};
+  chk('first_word',newWords>=1);chk('words_10',newWords>=10);chk('words_50',newWords>=50);
+  chk('streak_3',str>=3);chk('streak_7',str>=7);chk('streak_30',str>=30);
+  const wordsToday=(p.words_today||0)+(wordsLearned>0?wordsLearned:0);
+  const updates={xp_points:newXP,total_words_learned:newWords,daily_streak:str,longest_streak:lng,last_study_date:new Date().toISOString(),badges:earn,words_today:wordsToday};
+  await upsertProfile(uid,updates);
+  S.profile={...S.profile,...updates};
+  return{earned:now.map(id=>ALL_BADGES.find(b=>b.id===id)).filter(Boolean)};
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+async function doLogin(){
+  const e=val('loginEmail'),p=val('loginPass');
+  if(!e||!p)return showA('authAlert','Email and password required.','alert-e');
+  setBL('loginBtn',true,'...');
+  const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});
+  setBL('loginBtn',false,t('logIn'));
+  if(error)return showA('authAlert',error.message,'alert-e');
+  S.user=data.user;S.profile=await initProfile(S.user);
+  closeAuth();afterAuth();
+}
+async function doRegister(){
+  const name=val('regName'),uname=val('regUsername'),e=val('regEmail'),p=val('regPass');
+  if(!e||!p)return showA('authAlert','Email and password required.','alert-e');
+  if(p.length<6)return showA('authAlert','Password min 6 characters.','alert-e');
+  setBL('registerBtn',true,'...');
+  const{data,error}=await sb.auth.signUp({email:e,password:p,options:{data:{full_name:name||e.split('@')[0],username:uname||e.split('@')[0]}}});
+  setBL('registerBtn',false,t('createAccount'));
+  if(error)return showA('authAlert',error.message,'alert-e');
+  S.user=data.user;S.profile=await initProfile(S.user);
+  closeAuth();showPage('onboarding');showToast('Welcome to Hanji! 🎉','success');
+}
+async function logout(){
+  await sb.auth.signOut();S.user=null;S.profile=null;
+  eid('navAuth').style.display='flex';eid('navUser').style.display='none';
+  eid('bot-nav').style.display='none';showPage('landing');
+}
+function afterAuth(){
+  updateNav();eid('bot-nav').style.display='flex';
+  if(S.profile&&(S.profile.hsk_level||S.profile.completed_steps?.length)){
+    showPage('dashboard');loadDashboard();
+    setTimeout(checkPsychTriggers,1500);
+  } else showPage('onboarding');
+}
+function updateNav(){
+  const p=S.profile;
+  eid('navAuth').style.display='none';
+  eid('navUser').style.display='flex';
+  if(p){
+    eid('navStreak').textContent=`🔥 ${p.daily_streak||0}`;
+    const avEl=eid('navAv');
+    if(p.avatar_url){avEl.innerHTML=`<img src="${p.avatar_url}" alt="avatar"/>`;} 
+    else{avEl.textContent=(p.full_name||p.username||'H')[0].toUpperCase();}
+  }
+}
+
+// ============================================================
+// PAGES
+// ============================================================
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  eid(id)?.classList.add('active');
+  window.scrollTo(0,0);
+  ['home','vocab','rank','prof'].forEach(k=>eid('bn-'+k)?.classList.remove('act'));
+  const m={dashboard:'home','vocab-page':'vocab','rankings-page':'rank','profile-page':'prof'};
+  if(m[id])eid('bn-'+m[id])?.classList.add('act');
+  applyLang();
+}
+function goHome(){if(S.user){showPage('dashboard');loadDashboard();}else showPage('landing');}
+function openAuth(tab='login'){eid('authModal').classList.add('open');switchAuthTab(tab);eid('authAlert').innerHTML='';}
+function closeAuth(){eid('authModal').classList.remove('open');}
+function switchAuthTab(tab){
+  const il=tab==='login';
+  eid('tabL').classList.toggle('act',il);eid('tabR').classList.toggle('act',!il);
+  eid('loginForm').style.display=il?'block':'none';
+  eid('registerForm').style.display=il?'none':'block';
+  eid('modalTitle').textContent=il?t('logIn'):t('register');
+  eid('modalSub').textContent=il?'Continue your HSK journey':'Start learning for free';
+  eid('authAlert').innerHTML='';
+}
+eid('authModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAuth();});
+eid('upgradeOverlay').addEventListener('click',e=>{if(e.target===e.currentTarget)eid('upgradeOverlay').classList.remove('open');});
+
+// ============================================================
+// PSYCHOLOGY ENGINE — Duolingo tactics
+// ============================================================
+function checkPsychTriggers(){
+  if(!S.profile)return;
+  const p=S.profile;
+  const today=new Date().toDateString();
+  const last=p.last_study_date?new Date(p.last_study_date).toDateString():null;
+  const daysSince=last?Math.floor((new Date()-new Date(p.last_study_date))/(1000*60*60*24)):999;
+  const zone=eid('psychBannerZone');
+  if(!zone)return;
+  zone.innerHTML='';
+
+  // COMEBACK — missed 3+ days (loss recovery)
+  if(daysSince>=3){
+    zone.innerHTML=`<div class="psych-banner purple">
+      <div class="pb-icon">💪</div>
+      <div><div class="pb-title">${t('psych_comeback')}</div><div class="pb-sub">${t('psych_comeback_sub')}</div></div>
+      <div class="pb-action"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="startFirstAvailableLesson()">Start →</button></div>
+    </div>`;
+    return;
+  }
+
+  // STREAK AT RISK — hasn't studied today
+  if(last!==today&&(p.daily_streak||0)>=3){
+    zone.innerHTML=`<div class="psych-banner">
+      <div class="pb-icon">🔥</div>
+      <div><div class="pb-title">${t('psych_streak_risk')}</div><div class="pb-sub">${t('psych_streak_risk_sub',{n:p.daily_streak||0})}</div></div>
+      <div class="pb-action"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="startFirstAvailableLesson()">Study! →</button></div>
+    </div>`;
+    return;
+  }
+
+  // DAILY GOAL CLOSE — within 2 words of goal
+  const done=p.words_today||0,target=p.daily_goal||10;
+  const remaining=target-done;
+  if(remaining>0&&remaining<=2&&remaining<target){
+    zone.innerHTML=`<div class="psych-banner jade">
+      <div class="pb-icon">🎯</div>
+      <div><div class="pb-title">${t('psych_goal_close')}</div><div class="pb-sub">${t('psych_goal_close_sub',{n:remaining})}</div></div>
+      <div class="pb-action"><button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff" onclick="startFirstAvailableLesson()">Finish! →</button></div>
+    </div>`;
+    return;
+  }
+
+  // MILESTONE
+  const totalWords=p.total_words_learned||0;
+  const milestones=[10,25,50,100,200,300];
+  const nextMilestone=milestones.find(m=>m>totalWords);
+  if(nextMilestone&&(nextMilestone-totalWords)<=3&&totalWords>0){
+    zone.innerHTML=`<div class="psych-banner gold">
+      <div class="pb-icon">🌟</div>
+      <div><div class="pb-title">${t('psych_milestone',{n:totalWords})}</div><div class="pb-sub">${t('psych_milestone_sub',{pct:Math.round((totalWords/150)*100),lv:1})}</div></div>
+    </div>`;
+  }
+}
+
+function startFirstAvailableLesson(){
+  const p=S.profile;
+  const completed=Array.isArray(p?.completed_steps)?p.completed_steps:[];
+  for(const step of PATH[1]||[]){
+    if(!completed.includes(step.id)&&!step.locked_msg&&step.words?.length>0||step.type==='grammar'){
+      startStep(step.id,1);return;
+    }
+  }
+  showPage('dashboard');
+}
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+let obStep=1,obExp=null;
+function selChoice(el,v){document.querySelectorAll('#ob1 .ch-c').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');obExp=v;eid('ob1Btn').disabled=false;}
+function selHSK(el,n){document.querySelectorAll('#ob2 .ch-c').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');S.obHSK=n;eid('ob2Btn').disabled=false;}
+function selGoal(n){S.obGoal=n;document.querySelectorAll('#obGoalRow .goal-b').forEach(b=>b.classList.toggle('sel',parseInt(b.textContent)===n));}
+function nextOb(){
+  if(obStep===1){
+    if(obExp==='test'){eid('ob1').classList.remove('active');eid('ob-pt').classList.add('active');eid('pip1').classList.add('done');S.ptIdx=0;S.ptCorrect=0;renderPT();return;}
+    eid('ob1').classList.remove('active');eid('ob2').classList.add('active');eid('pip1').classList.add('done');obStep=2;
+  } else if(obStep===2){eid('ob2').classList.remove('active');eid('ob3').classList.add('active');eid('pip2').classList.add('done');obStep=3;}
+}
+async function finishOb(){
+  const lv=S.obHSK||1,gl=S.obGoal||10;
+  if(S.user){await upsertProfile(S.user.id,{hsk_level:lv,daily_goal:gl,completed_steps:[],hsk_scores:{}});S.profile=await getProfile(S.user.id);}
+  showPage('dashboard');loadDashboard();
+  setTimeout(()=>showToast(t('startLearning'),'success'),500);
+}
+
+const PT_QS=[
+  {q:'What does 你好 mean?',opts:['Goodbye','Thank you','Hello','Sorry'],ans:2},
+  {q:'Which means "to eat"?',opts:['喝','去','吃','来'],ans:2},
+  {q:'I like = ?',opts:['我要','我是','我有','我喜欢'],ans:3},
+  {q:'学生 means?',opts:['Teacher','Student','School','Book'],ans:1},
+  {q:'Friend = ?',opts:['朋友','家人','同事','邻居'],ans:0},
+  {q:'我 ___ 去 (I want to go)',opts:['是','有','要','可以'],ans:2},
+  {q:'虽然…但是 expresses?',opts:['Cause/effect','Although…but','If…then','Not only…but also'],ans:1},
+  {q:'"I have been to Beijing" = ?',opts:['我去北京','我去了北京','我去过北京','我会去北京'],ans:2},
+  {q:'尽管如此 means?',opts:['Therefore','However','In addition','Nevertheless'],ans:3},
+  {q:'Which expresses regret?',opts:['早知道就好了','我应该去','如果我去','要不是因为'],ans:0},
+];
+function renderPT(){
+  const q=PT_QS[S.ptIdx];if(!q){finishPT();return;}
+  setText('ptNum',`${t('placementTest')} ${S.ptIdx+1}/10`);
+  setText('ptQ',q.q);
+  eid('ptOpts').innerHTML=q.opts.map((o,i)=>`<button class="pt-opt" onclick="ansPT(this,${i},${q.ans})">${o}</button>`).join('');
+}
+function ansPT(btn,chosen,correct){
+  document.querySelectorAll('.pt-opt').forEach(b=>b.disabled=true);
+  if(chosen===correct){btn.classList.add('correct');S.ptCorrect++;}
+  else{btn.classList.add('wrong');document.querySelectorAll('.pt-opt')[correct]?.classList.add('correct');}
+  setTimeout(()=>{S.ptIdx++;S.ptIdx<PT_QS.length?renderPT():finishPT();},900);
+}
+function finishPT(){
+  let lv=1;if(S.ptCorrect>=8)lv=4;else if(S.ptCorrect>=6)lv=3;else if(S.ptCorrect>=4)lv=2;
+  S.obHSK=lv;
+  eid('ptCard').innerHTML=`<div style="text-align:center;padding:16px 0"><div style="font-size:13px;color:var(--ink5);margin-bottom:8px">Your result</div><div style="font-family:'Noto Serif SC',serif;font-size:72px;color:var(--red);margin:12px 0">HSK ${lv}</div><div style="font-size:15px;color:var(--ink7);margin-bottom:22px">${S.ptCorrect}/10 correct</div><button class="btn btn-r btn-lg btn-full" onclick="goOb3()">${t('continue')}</button></div>`;
+}
+function goOb3(){eid('ob-pt').classList.remove('active');eid('ob3').classList.add('active');eid('pip2').classList.add('done');obStep=3;}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function loadDashboard(){
+  if(!S.profile)return;
+  const p=S.profile;
+  const hr=new Date().getHours();
+  setText('dashTime',hr<12?'morning':hr<17?'afternoon':'evening');
+  setText('dashName',p.full_name||p.username||'Learner');
+  setText('dashDate',new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}));
+  setText('dashStreak',p.daily_streak||0);
+  setText('dashXP',(p.xp_points||0).toLocaleString());
+  setText('dashWords',p.total_words_learned||0);
+  setText('stToday',p.words_today||0);
+  setText('stMastered',Math.floor((p.total_words_learned||0)*0.3));
+  setText('stLevel',p.hsk_level||1);
+  setText('stBest',p.longest_streak||0);
+  const done=p.words_today||0,target=p.daily_goal||10;
+  const pct=Math.min(100,Math.round((done/target)*100));
+  setText('goalDone',done);setText('goalTarget',target);
+  setTimeout(()=>{eid('goalBar').style.width=pct+'%';},100);
+  const msgs=[t('dailyGoal')+'! 💪','Every word counts! 🎯','Short sessions beat long cramming ⚡'];
+  const gm=eid('goalMsg');
+  if(pct>=100){gm.textContent='🎉 Goal complete! Amazing work!';gm.className='goal-msg good';}
+  else{gm.textContent=msgs[Math.floor(Math.random()*msgs.length)];gm.className='goal-msg';}
+  renderHSKMap();
+  checkPsychTriggers();
+  applyLang();
+}
+
+function renderHSKMap(){
+  const p=S.profile;
+  const completed=Array.isArray(p?.completed_steps)?p.completed_steps:[];
+  const scores=p?.hsk_scores||{};
+  let html='';
+  [1,2,3,4,5,6].forEach(lv=>{
+    const steps=PATH[lv]||[];
+    const prevDone=lv===1||completed.includes(`s${lv-1}_test`)||(lv===2&&scores[1]>=180);
+    const lvDoneCount=steps.filter(s=>completed.includes(s.id)).length;
+    const lvTotal=steps.filter(s=>!s.isUnlockTest).length;
+    const isUnlocked=lv===1||prevDone;
+    const lvCls=!isUnlocked?'hlb-locked':lvDoneCount>=lvTotal?'hlb-done':'hlb-act';
+    const lvNames=['Foundation','Elementary','Intermediate','Upper Intermediate','Advanced','Mastery'];
+    const score=scores[lv];
+    html+=`<div class="hsk-lv-block"><div class="hsk-lv-hd"><div class="hsk-lv-badge ${lvCls}">HSK ${lv}</div><div><div class="hsk-lv-name">${lvNames[lv-1]||'Level '+lv}</div><div class="hsk-lv-prog">${isUnlocked?lvDoneCount+'/'+lvTotal+' steps':'🔒 Complete HSK '+(lv-1)+' first'}${score?' · Score: '+score+'/300':''}</div></div></div>`;
+    if(isUnlocked){
+      html+='<div class="path-steps">';
+      steps.forEach((step,i)=>{
+        const isDone=completed.includes(step.id);
+        const prev=steps[i-1];
+        const isCur=!isDone&&(i===0||completed.includes(prev?.id));
+        const isLk=(!isDone&&!isCur)||!!step.locked_msg;
+        const cls=isDone?'ps-done':isCur?'ps-cur':isLk?'ps-lk':'';
+        const icoCls=isDone?'psi-g':isCur?'psi-r':'psi-k';
+        const stIco=isDone?'✅':isCur?'▶️':'🔒';
+        const onclick=isLk?'':`onclick="startStep('${step.id}',${lv})"`;
+        html+=`<div class="ps ${cls}" ${onclick}>
+          <div class="ps-ico ${icoCls}">${step.icon}</div>
+          <div class="ps-info"><div class="ps-name">${step.title}</div><div class="ps-meta">${step.desc}</div></div>
+          <div class="ps-right"><div class="ps-xp">+${step.xp} XP</div><div class="ps-status">${stIco}</div></div>
+        </div>`;
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  eid('hskMap').innerHTML=html;
+}
+
+// ============================================================
+// LESSON ENGINE
+// ============================================================
+function startStep(stepId,hskLv){
+  const steps=PATH[hskLv]||[];
+  const step=steps.find(s=>s.id===stepId);
+  if(!step)return;
+  S.lessonStep=step;
+  if(step.type==='grammar'){
+    S.learnWords=[];
+    showPage('lesson-page');
+    setPhase('learn');
+    renderGrammarLesson(step);
+  } else if(step.type==='hsk_test'||step.type==='unlock_test'){
+    S.learnWords=Object.values(W);
+    showPage('lesson-page');
+    setPhase('learn');
+    // Skip directly to test for HSK final/unlock tests
+    startTestPhase();
+  } else {
+    S.learnWords=step.words.map(wid=>W[wid]).filter(Boolean);
+    S.learnIdx=0;
+    showPage('lesson-page');
+    setPhase('learn');
+    renderLearnCard();
+  }
+}
+
+function setPhase(phase){
+  ['learn','practice','test'].forEach(ph=>{
+    eid(ph+'-ph').style.display=ph===phase?'block':'none';
+    const tab=eid('ptab-'+ph);
+    tab.classList.remove('act','done');
+    if(ph===phase)tab.classList.add('act');
+    if((ph==='learn'&&(phase==='practice'||phase==='test'))||(ph==='practice'&&phase==='test'))tab.classList.add('done');
+  });
+  const lbl={learn:'LEARN PHASE',practice:'PRACTICE PHASE',test:'TEST PHASE'};
+  setText('lesPhaseLbl',lbl[phase]);
+  S.lessonPhase=phase;
+}
+
+function leavelesson(){
+  showPage('dashboard');
+  loadDashboard();
+}
+
+// ── LEARN ──
+function renderLearnCard(){
+  const w=S.learnWords[S.learnIdx];
+  if(!w){startPracticePhase();return;}
+  const pct=Math.round((S.learnIdx/S.learnWords.length)*33);
+  eid('lesProgBar').style.width=pct+'%';
+  eid('learn-ph').innerHTML=`
+    <div class="wcard">
+      <div class="wc-hsk">HSK 1</div>
+      <div class="wc-char">${w.ch}</div>
+      <div class="wc-py">${w.py}</div>
+      <div class="wc-en">${w.en}</div>
+      <div class="wc-pos">${w.pos.toUpperCase()}</div>
+      <button class="wc-aud" onclick="speak('${w.ch.replace(/'/g,"\\'")}')">🔊</button>
+    </div>
+    <div class="usage-note"><div class="un-lbl">💡 Usage Note</div><div class="un-txt">${w.usage}</div></div>
+    <div class="ex-box">${w.ex.map(e=>`<div class="ex-item"><div class="ex-cn">${e.cn}</div><div class="ex-py">${e.py}</div><div class="ex-en">${e.en}</div></div>`).join('')}</div>
+    <div class="learn-nav">
+      ${S.learnIdx>0?`<button class="btn btn-o" onclick="prevWord()">← ${t('practice')}</button>`:''}
+      <button class="btn btn-r" onclick="nextWord()">${S.learnIdx===S.learnWords.length-1?t('practice')+' →':'Next →'}</button>
+    </div>`;
+}
+function prevWord(){if(S.learnIdx>0){S.learnIdx--;renderLearnCard();}}
+function nextWord(){
+  if(S.learnIdx<S.learnWords.length-1){S.learnIdx++;renderLearnCard();}
+  else startPracticePhase();
+}
+function speak(txt){
+  if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(txt);u.lang='zh-CN';u.rate=0.8;window.speechSynthesis.speak(u);}
+}
+
+// ── GRAMMAR ──
+function renderGrammarLesson(step){
+  const gl=GRAM[step.gramId];if(!gl)return;
+  eid('lesProgBar').style.width='20%';
+  eid('learn-ph').innerHTML=`
+    <div class="gram-c">
+      <span class="pill pill-b" style="margin-bottom:10px">Grammar Lesson</span>
+      <div class="gram-title">${gl.title}</div>
+      <div class="gram-sub">${gl.explanation}</div>
+      <div class="gram-pat">${gl.pattern}</div>
+      ${gl.rules.map(r=>`<div class="gram-rule"><div class="gram-rule-t">${r.title}</div><div class="gram-rule-d">${r.desc}</div></div>`).join('')}
+    </div>
+    <div class="ex-box">${gl.examples.map(e=>`<div class="ex-item"><div class="ex-cn">${e.cn}</div><div class="ex-py">${e.py}</div><div class="ex-en">${e.en}</div></div>`).join('')}</div>
+    <div class="learn-nav"><button class="btn btn-r" onclick="startGramPractice('${gl.id}')">${t('practice')} →</button></div>`;
+}
+
+function startGramPractice(glId){
+  const gl=GRAM[glId];
+  S.pracQueue=buildGramExercises(gl);
+  S.pracIdx=0;S.pracCorrect=0;
+  setPhase('practice');
+  renderExercise(false);
+}
+
+function buildGramExercises(gl){
+  const exs=[];
+  if(gl.id==='g01'){
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:t('ex_what_mean',{char:'是'}).replace(/{char}/,'是')+' — which sentence is correct?',correct:'我是学生。',opts:['我是很好。','我是学生。','他是高。','这是大的。'],explanation:'是 links subject to a NOUN (identity). Never use 是 before adjectives like 好 or 高!'});
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:'"I am NOT a teacher" = ?',correct:'我不是老师。',opts:['我没是老师。','我是不老师。','我不是老师。','不我是老师。'],explanation:'Use 不是 to negate 是. 不 goes directly before 是.'});
+    exs.push({typeLabel:t('ex_fill_blank')+' 她 ___ 我的老师。',correct:'是',opts:['有','是','很','在'],explanation:'是 connects subject to the noun (identity/profession).'});
+  } else if(gl.id==='g02'){
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:'"I don\'t have time" = ?',correct:'我没有时间。',opts:['我不有时间。','我没有时间。','我不时间。','我有没时间。'],explanation:'NEVER say 不有! The rule: 有 is ALWAYS negated with 没, never 不.'});
+    exs.push({typeLabel:t('ex_fill_blank')+' 我 ___ 喜欢咖啡。',correct:'不',opts:['没','不','有','很'],explanation:'Use 不 to negate verbs like 喜欢. 没 is only for negating 有.'});
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:'Which is CORRECT?',correct:'他没有钱。',opts:['他不有钱。','他没喜欢茶。','他没有钱。','他不没钱。'],explanation:'他没有钱 (He has no money) is correct. 没有 negates 有.'});
+  } else {
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:'"my book" = ?',correct:'我的书',opts:['我书','的我书','我的书','书我的'],explanation:'Owner + 的 + Noun: 我的书 = my book.'});
+    exs.push({typeLabel:t('ex_grammar_mc'),prompt:'"her friend" = ?',correct:'她的朋友',opts:['她朋友','的她朋友','她的朋友','朋友的她'],explanation:'她的朋友 — possession: owner + 的 + thing owned.'});
+  }
+  return exs;
+}
+
+// ── PRACTICE PHASE ──
+function startPracticePhase(){
+  setPhase('practice');
+  S.pracQueue=[];S.pracIdx=0;S.pracCorrect=0;
+  const pool=S.learnWords;
+  pool.forEach(w=>{
+    S.pracQueue.push(makeEx(w,'meaning',pool));
+    S.pracQueue.push(makeEx(w,'char',pool));
+    if(w.ex?.length)S.pracQueue.push(makeEx(w,'fill',pool));
+  });
+  S.pracQueue=shuffle(S.pracQueue).slice(0,Math.max(6,pool.length*2));
+  renderExercise(false);
+}
+
+function makeEx(word,type,pool){
+  const others=shuffle((pool||Object.values(W)).filter(w=>w.ch!==word.ch));
+  const w3=others.slice(0,3);
+  if(type==='meaning'){
+    const opts=shuffle([word.en,...w3.map(w=>w.en)]);
+    return{
+      typeLabel:t('ex_what_mean',{char:word.ch}),
+      prompt:`<span class="big-char">${word.ch}</span>`,
+      correct:word.en,opts,isFC:false,
+      explanation:`${word.ch} (${word.py}) = "${word.en}". ${word.usage.split('.')[0]}.`
+    };
+  }
+  if(type==='char'){
+    const opts=shuffle([word.ch,...w3.map(w=>w.ch)]);
+    return{
+      typeLabel:t('ex_which_char',{word:word.en}),
+      prompt:`"<strong>${word.en}</strong>"`,
+      correct:word.ch,opts,isFC:true,
+      explanation:`${t('ex_correct')} ${word.ch} (${word.py}) = "${word.en}".`
+    };
+  }
+  // fill blank
+  const ex=word.ex[0];
+  const blanked=ex.cn.replace(word.ch,`<span class="blank">___</span>`);
+  const opts=shuffle([word.ch,...w3.map(w=>w.ch)]);
+  return{
+    typeLabel:t('ex_fill_blank'),
+    prompt:`${blanked}<br/><small style="color:var(--ink5);font-size:13px">${ex.en}</small>`,
+    correct:word.ch,opts,isFC:true,
+    explanation:`${word.ch} fits here — it means "${word.en}".`
+  };
+}
+
+// ── CORE EXERCISE RENDERER (FIXED) ──
+function renderExercise(isTest){
+  const queue=isTest?S.testQueue:S.pracQueue;
+  const idx=isTest?S.testIdx:S.pracIdx;
+  const phEl=isTest?'test-ph':'practice-ph';
+  const ex=queue[idx];
+
+  // If no exercise, move to next phase
+  if(!ex){
+    if(isTest)showTestResult();
+    else startTestPhase();
+    return;
+  }
+
+  const total=queue.length;
+  const base=isTest?66:33;
+  const pct=base+Math.round((idx/Math.max(total,1))*33);
+  eid('lesProgBar').style.width=pct+'%';
+
+  const label=isTest?`${t('test')} ${idx+1}/${total}`:ex.typeLabel;
+  const gridCls=(ex.opts?.length||0)<=2?'opts1':'opts2';
+  const optHtml=(ex.opts||[]).map(opt=>{
+    const safe=opt.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safeCor=ex.correct.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    return `<button class="opt${ex.isFC?' opt-fc':''}" 
+      onclick="checkAns(this,'${safe}','${safeCor}',${isTest},'${ex.explanation.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"
+    >${opt}</button>`;
+  }).join('');
+
+  eid(phEl).innerHTML=`
+    <div class="ex-card">
+      <div class="ex-type">${label}</div>
+      <div class="ex-prompt">${ex.prompt}</div>
+      <div class="${gridCls}" id="optGrid">${optHtml}</div>
+    </div>
+    <div id="exFb" style="display:none"></div>
+    <button class="btn btn-r" id="exNext" style="display:none;margin:0 auto"
+      onclick="${isTest?'nextTestQ()':'nextPracQ()'}">${t('continue')}</button>`;
+}
+
+// THE FIX — checkAns is called with full explanation, no stale closure issues
+function checkAns(btn,chosen,correct,isTest,explanation){
+  const grid=btn.parentElement;
+  if(!grid)return;
+  grid.querySelectorAll('.opt').forEach(b=>{b.disabled=true;b.style.cursor='default';});
+  const isCorrect=chosen.trim()===correct.trim();
+  if(isCorrect){
+    btn.classList.add('correct');
+    if(isTest)S.testCorrect++;else S.pracCorrect++;
+    showFb(isTest,true,t('ex_correct'),explanation);
+  } else {
+    btn.classList.add('wrong');
+    grid.querySelectorAll('.opt').forEach(b=>{if(b.textContent.trim()===correct.trim())b.classList.add('correct');});
+    showFb(isTest,false,t('ex_wrong'),explanation);
+  }
+  const nextBtn=eid('exNext');
+  if(nextBtn)nextBtn.style.display='flex';
+}
+
+function showFb(isTest,ok,title,text){
+  const el=eid('exFb');if(!el)return;
+  el.innerHTML=`<div class="feedback ${ok?'fb-c':'fb-w'}"><div class="fb-title">${title}</div><div class="fb-text">${text}</div></div>`;
+  el.style.display='block';
+}
+
+function nextPracQ(){S.pracIdx++;renderExercise(false);}
+
+// ── TEST PHASE — ALWAYS reset counters ──
+function startTestPhase(){
+  setPhase('test');
+  S.testIdx=0;     // ALWAYS reset
+  S.testCorrect=0; // ALWAYS reset
+  const words=S.learnWords.length>0?S.learnWords:[];
+  if(words.length===0&&S.lessonStep?.type==='grammar'){
+    const gl=GRAM[S.lessonStep.gramId];
+    S.testQueue=gl?buildGramExercises(gl).slice(0,3):[];
+  } else if(words.length===0){
+    // HSK final test — use all words
+    const allW=shuffle(Object.values(W));
+    S.testQueue=allW.slice(0,20).map(w=>makeEx(w,Math.random()>.5?'meaning':'char',allW));
+  } else {
+    S.testQueue=shuffle(words.map(w=>makeEx(w,Math.random()>.5?'meaning':'char',S.learnWords))).slice(0,5);
+  }
+  if(!S.testQueue.length){finishLesson(100);return;}
+  renderExercise(true);
+}
+
+// Retry test — ALWAYS resets both counters
+function retryTest(){
+  S.testIdx=0;
+  S.testCorrect=0;
+  startTestPhase();
+}
+
+function nextTestQ(){S.testIdx++;renderExercise(true);}
+
+async function showTestResult(){
+  const total=S.testQueue.length;
+  const needed=Math.ceil(total*0.8);
+  const passed=S.testCorrect>=needed;
+  if(passed){
+    const score=Math.round((S.testCorrect/total)*100);
+    if(score===100)launchConfetti();
+    await finishLesson(score);
+  } else {
+    eid('test-ph').innerHTML=`
+      <div class="test-fail">
+        <div style="font-size:54px;margin-bottom:12px">😓</div>
+        <h3 class="fd" style="font-size:26px;color:var(--ink);margin-bottom:6px">${t('almost')}</h3>
+        <p style="font-size:14px;color:var(--ink5);margin-bottom:5px">${S.testCorrect}/${total} — need ${needed}</p>
+        <p style="font-size:13px;color:var(--ink5);margin-bottom:24px">${t('almostSub')}</p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-o" onclick="startStep('${S.lessonStep?.id}',1)">${t('reviewWords')}</button>
+          <button class="btn btn-r" onclick="retryTest()">${t('retryTest')}</button>
+        </div>
+      </div>`;
+  }
+}
+
+async function finishLesson(score){
+  const step=S.lessonStep;
+  const xp=step.xp;
+  const wc=S.learnWords.length;
+  let earnedBadges=[];
+  if(S.user){
+    for(const w of S.learnWords)await saveWord(S.user.id,w);
+    const res=await awardXP(S.user.id,xp,wc);
+    earnedBadges=res.earned||[];
+    if(step.type==='grammar'&&!(S.profile.badges||[]).includes('grammar_1')){
+      const b=[...(S.profile.badges||[]),'grammar_1'];
+      await upsertProfile(S.user.id,{badges:b});S.profile.badges=b;
+      earnedBadges.push(ALL_BADGES.find(b=>b.id==='grammar_1'));
+    }
+    const steps=Array.isArray(S.profile.completed_steps)?[...S.profile.completed_steps]:[];
+    if(!steps.includes(step.id)){steps.push(step.id);await upsertProfile(S.user.id,{completed_steps:steps});S.profile.completed_steps=steps;}
+    if(step.type==='hsk_test'||step.type==='unlock_test'){
+      const sc=Math.round((S.testCorrect/Math.max(S.testQueue.length,1))*300);
+      const scores={...(S.profile.hsk_scores||{})};scores[1]=sc;
+      await upsertProfile(S.user.id,{hsk_scores:scores});S.profile.hsk_scores=scores;
+      if(sc>=180){
+        const b=[...(S.profile.badges||[])];
+        if(!b.includes('hsk1_done')){b.push('hsk1_done');await upsertProfile(S.user.id,{badges:b});S.profile.badges=b;earnedBadges.push(ALL_BADGES.find(b=>b.id==='hsk1_done'));}
+      }
+    }
+  }
+  setText('compEmoji',score===100?'🌟':score>=80?'🎉':'✅');
+  setText('compTitle',score===100?'Perfect! 🌟':score>=80?'Lesson Complete!':'Well done!');
+  setText('compSub',`${wc>0?wc+' words · ':''}${S.testCorrect}/${S.testQueue.length} correct · +${xp} XP`);
+  setText('compXP',xp);
+  eid('compBadges').innerHTML=(earnedBadges||[]).filter(Boolean).map(b=>`<div class="nbadge">${b.icon} ${b.name}</div>`).join('');
+  eid('compAd').style.display=S.profile?.subscription_tier==='free'?'block':'none';
+  eid('compOverlay').classList.add('open');
+  applyLang();
+}
+
+function closeComp(){eid('compOverlay').classList.remove('open');showPage('dashboard');loadDashboard();}
+function nextLesson(){
+  eid('compOverlay').classList.remove('open');
+  let found=false;
+  for(const lv of [1,2,3,4,5,6]){
+    const steps=PATH[lv]||[];
+    for(let i=0;i<steps.length;i++){
+      if(steps[i].id===S.lessonStep?.id&&i<steps.length-1&&!steps[i+1].locked_msg){
+        startStep(steps[i+1].id,lv);found=true;break;
+      }
+    }
+    if(found)break;
+  }
+  if(!found){showPage('dashboard');loadDashboard();showToast('🏆 All available lessons complete!','gold');}
+}
+
+// Practice All
+async function startPracticeAll(){
+  if(!S.user){openAuth('register');return;}
+  S.userWords=await getUserWords(S.user.id);
+  if(!S.userWords.length){showToast('Learn some words first!','info');return;}
+  const words=S.userWords.map(uw=>W[uw.word_id]||{ch:uw.chinese,py:uw.pinyin,en:uw.english,ex:[{cn:uw.chinese,py:uw.pinyin,en:uw.english}],usage:''}).filter(Boolean);
+  if(!words.length){showToast('No words to practice.','info');return;}
+  S.lessonStep={id:'practice_all',title:'Practice All',icon:'🔄',xp:20,type:'practice_all'};
+  S.learnWords=words;
+  S.pracQueue=[];S.pracIdx=0;S.pracCorrect=0;
+  words.forEach(w=>{S.pracQueue.push(makeEx(w,'meaning',words));S.pracQueue.push(makeEx(w,'char',words));});
+  S.pracQueue=shuffle(S.pracQueue).slice(0,20);
+  setPhase('practice');
+  showPage('lesson-page');
+  renderExercise(false);
+}
+
+// ============================================================
+// VOCAB PAGE
+// ============================================================
+async function loadVocabPage(){
+  if(!S.user){eid('vocGrid').innerHTML=`<div class="empty-s" style="grid-column:1/-1"><div class="empty-ch">字</div><div class="empty-t">Not logged in</div><button class="btn btn-r" onclick="openAuth('register')" style="margin-top:12px">Get Started</button></div>`;return;}
+  eid('vocGrid').innerHTML='<div class="load-s" style="grid-column:1/-1"><div class="load-ch">字</div></div>';
+  S.userWords=await getUserWords(S.user.id);
+  setText('vocCountLbl',`${S.userWords.length} word${S.userWords.length!==1?'s':''}`);
+  renderVocGrid();
+}
+function filtVoc(f,btn){S.vocFilter=f;document.querySelectorAll('.filt').forEach(b=>b.classList.remove('act'));btn.classList.add('act');renderVocGrid();}
+function renderVocGrid(){
+  let words=S.userWords;
+  if(S.vocFilter==='learning')words=words.filter(w=>w.times_correct<2);
+  else if(S.vocFilter==='reviewing')words=words.filter(w=>w.times_correct>=2&&w.times_correct<5);
+  else if(S.vocFilter==='mastered')words=words.filter(w=>w.times_correct>=5);
+  if(!words.length){eid('vocGrid').innerHTML=`<div class="empty-s" style="grid-column:1/-1"><div class="empty-ch">字</div><div class="empty-t">No words here</div><div class="empty-d">Start a lesson to build vocabulary.</div><button class="btn btn-r" onclick="goHome()">Go to Lessons</button></div>`;return;}
+  eid('vocGrid').innerHTML=words.map(w=>{
+    const st=w.times_correct>=5?'mastered':w.times_correct>=2?'reviewing':'learning';
+    const stMap={mastered:'⭐',reviewing:'🔄',learning:'📖'};
+    const clMap={mastered:'pill-g',reviewing:'pill-j',learning:'pill-k'};
+    const stLabel={mastered:t('mastered'),reviewing:t('reviewing'),learning:t('learning')};
+    return `<div class="voc-c"><div class="vc-char">${w.chinese}</div><div class="vc-py">${w.pinyin}</div><div class="vc-en">${w.english}</div><span class="pill ${clMap[st]}">${stMap[st]} ${stLabel[st]}</span></div>`;
+  }).join('');
+}
+
+// ============================================================
+// RANKINGS PAGE
+// ============================================================
+let rankTabCur='global';
+async function loadRankings(){
+  eid('rankContent').innerHTML='<div class="load-s"><div class="load-ch">排</div></div>';
+  if(S.user)eid('inviteLink').textContent=`hanji.app/invite/${S.user.id.slice(0,8)}`;
+  if(rankTabCur==='global')await loadGlobalRank();
+  else await loadFriendsRank();
+}
+function switchRankTab(tab){
+  rankTabCur=tab;
+  eid('rt-g').classList.toggle('act',tab==='global');
+  eid('rt-f').classList.toggle('act',tab==='friends');
+  loadRankings();
+}
+async function loadGlobalRank(){
+  const{data,error}=await sb.from('leaderboard').select('*').limit(50);
+  if(error||!data?.length){eid('rankContent').innerHTML=`<div class="empty-s"><div class="empty-ch">榜</div><div class="empty-t">No rankings yet</div><div class="empty-d">Be first!</div><button class="btn btn-r" onclick="openAuth('register')">Start</button></div>`;return;}
+  const medals=['🥇','🥈','🥉'];
+  const following=S.profile?.following||[];
+  eid('rankContent').innerHTML=`<div class="rank-list">${data.map(u=>{
+    const rk=u.rank||0,isMe=S.user&&u.id===S.user.id;
+    const av=(u.full_name||u.username||'?')[0].toUpperCase();
+    const isF=following.includes(u.id);
+    const avHtml=u.avatar_url?`<img src="${u.avatar_url}" alt="av"/>`:`${av}`;
+    return `<div class="rank-c ${rk<=3?'r'+rk:''} ${isMe?'is-me':''}" onclick="viewUserProf('${u.id}','${(u.full_name||u.username||'User').replace(/'/g,"\\'")}',${u.xp_points||0},${u.daily_streak||0},${u.total_words_learned||0},'${u.avatar_url||''}')">
+      <div class="rank-pos">${rk<=3?medals[rk-1]:rk}</div>
+      <div class="rank-av">${avHtml}</div>
+      <div class="rank-info">
+        <div class="rank-name">${u.username||u.full_name||'Learner'}${isMe?'<span class="you-tag">YOU</span>':''}</div>
+        <div class="rank-meta">HSK ${u.hsk_level||1} · 🔥${u.daily_streak||0} · ${u.total_words_learned||0} words</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="rank-xp"><div class="rank-xp-v">${(u.xp_points||0).toLocaleString()}</div><div class="rank-xp-l">XP</div></div>
+        ${!isMe?`<button class="follow-btn ${isF?'fing':''}" onclick="event.stopPropagation();toggleFollow('${u.id}',this)">${isF?t('following2'):t('follow')}</button>`:''}
+      </div>
+    </div>`;}).join('')}</div>`;
+}
+async function loadFriendsRank(){
+  if(!S.user){eid('rankContent').innerHTML=`<div class="empty-s"><div class="empty-ch">友</div><div class="empty-t">Log in first</div></div>`;return;}
+  const following=S.profile?.following||[];
+  if(!following.length){eid('rankContent').innerHTML=`<div class="empty-s"><div class="empty-ch">友</div><div class="empty-t">No friends yet</div><div class="empty-d">${t('notFollowing')}</div></div>`;return;}
+  const{data}=await sb.from('profiles').select('id,full_name,username,xp_points,daily_streak,total_words_learned,hsk_level,avatar_url').in('id',following).order('xp_points',{ascending:false});
+  if(!data?.length){eid('rankContent').innerHTML='<div class="empty-s"><div class="empty-ch">友</div></div>';return;}
+  eid('rankContent').innerHTML=`<div class="rank-list">${data.map((u,i)=>{
+    const av=(u.full_name||u.username||'?')[0].toUpperCase();
+    const avHtml=u.avatar_url?`<img src="${u.avatar_url}" alt="av"/>`:`${av}`;
+    return `<div class="rank-c ${i<3?'r'+(i+1):''}">
+      <div class="rank-pos">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div class="rank-av">${avHtml}</div>
+      <div class="rank-info"><div class="rank-name">${u.username||u.full_name||'Learner'}</div><div class="rank-meta">HSK ${u.hsk_level||1} · 🔥${u.daily_streak||0}</div></div>
+      <div class="rank-xp"><div class="rank-xp-v">${(u.xp_points||0).toLocaleString()}</div><div class="rank-xp-l">XP</div></div>
+    </div>`;}).join('')}</div>`;
+}
+async function toggleFollow(uid,btn){
+  if(!S.user){openAuth('register');return;}
+  const following=Array.isArray(S.profile?.following)?[...S.profile.following]:[];
+  const idx=following.indexOf(uid);
+  if(idx>-1){following.splice(idx,1);btn.textContent=t('follow');btn.classList.remove('fing');}
+  else{following.push(uid);btn.textContent=t('following2');btn.classList.add('fing');}
+  await upsertProfile(S.user.id,{following});S.profile={...S.profile,following};
+}
+function viewUserProf(id,name,xp,streak,words,avatarUrl){
+  const av=avatarUrl?`<img src="${avatarUrl}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;" alt="av"/>` :`<div style="width:70px;height:70px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;">${name[0].toUpperCase()}</div>`;
+  eid('profViewContent').innerHTML=`
+    <div style="text-align:center">
+      <div style="display:flex;justify-content:center;margin-bottom:14px">${av}</div>
+      <div class="fd" style="font-size:22px;color:var(--ink);margin-bottom:3px">${name}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin:18px 0">
+        <div style="background:var(--ink07);border-radius:10px;padding:12px;text-align:center"><div class="fd" style="font-size:20px;font-weight:700">${xp.toLocaleString()}</div><div style="font-size:10px;color:var(--ink3);text-transform:uppercase">XP</div></div>
+        <div style="background:var(--ink07);border-radius:10px;padding:12px;text-align:center"><div class="fd" style="font-size:20px;font-weight:700">🔥 ${streak}</div><div style="font-size:10px;color:var(--ink3);text-transform:uppercase">Streak</div></div>
+        <div style="background:var(--ink07);border-radius:10px;padding:12px;text-align:center"><div class="fd" style="font-size:20px;font-weight:700">${words}</div><div style="font-size:10px;color:var(--ink3);text-transform:uppercase">Words</div></div>
+      </div>
+      <button class="btn btn-r btn-full" onclick="eid('profViewOverlay').classList.remove('open')">Close</button>
+    </div>`;
+  eid('profViewOverlay').classList.add('open');
+}
+
+// Friend search by username
+async function searchFriends(){
+  const q=(eid('friendSearch')?.value||'').trim();
+  if(!q)return;
+  const{data}=await sb.from('profiles').select('id,full_name,username,xp_points,avatar_url').ilike('username','%'+q+'%').limit(10);
+  if(!data?.length){eid('searchResults').innerHTML='<div style="font-size:13px;color:var(--ink5);padding:10px 0">No users found.</div>';return;}
+  const following=S.profile?.following||[];
+  eid('searchResults').innerHTML=`<div class="search-results">${data.map(u=>{
+    if(S.user&&u.id===S.user.id)return '';
+    const av=u.avatar_url?`<img src="${u.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="av"/>` :`<div class="sr-av">${(u.username||'?')[0].toUpperCase()}</div>`;
+    const isF=following.includes(u.id);
+    return `<div class="sr-item" onclick="viewUserProf('${u.id}','${(u.username||u.full_name||'User').replace(/'/g,"\\'")}',${u.xp_points||0},0,0,'${u.avatar_url||''}')">
+      ${av}
+      <div class="sr-name">${u.username||u.full_name||'User'}</div>
+      <div class="sr-xp">${(u.xp_points||0)} XP</div>
+      <button class="follow-btn ${isF?'fing':''}" onclick="event.stopPropagation();toggleFollowById('${u.id}',this)">${isF?t('following2'):t('follow')}</button>
+    </div>`;}).join('')}</div>`;
+}
+async function toggleFollowById(uid,btn){
+  if(!S.user){openAuth('register');return;}
+  const following=Array.isArray(S.profile?.following)?[...S.profile.following]:[];
+  const idx=following.indexOf(uid);
+  if(idx>-1){following.splice(idx,1);btn.textContent=t('follow');btn.classList.remove('fing');}
+  else{following.push(uid);btn.textContent=t('following2');btn.classList.add('fing');}
+  await upsertProfile(S.user.id,{following});S.profile={...S.profile,following};
+}
+
+// Find nearby (geolocation permission)
+function findNearby(){
+  if(!S.user){openAuth('register');return;}
+  eid('permIco').textContent='📍';
+  setText('permTitle','Find Nearby Learners?');
+  setText('permSub','Allow Hanji to access your location to find learners studying near you.');
+  S.permCallback=()=>{
+    if('geolocation' in navigator){
+      navigator.geolocation.getCurrentPosition(pos=>{
+        showToast(`📍 Looking for learners near you...`,'info');
+        // In production: query users by geo location
+        setTimeout(()=>showToast('Found 3 learners near you! Check Rankings.','success'),1500);
+      },err=>showToast('Location not available.','error'));
+    }
+  };
+  eid('permOverlay').classList.add('open');
+}
+
+// Find contacts (contacts API permission)
+function findContacts(){
+  if(!S.user){openAuth('register');return;}
+  eid('permIco').textContent='📱';
+  setText('permTitle','Import Contacts?');
+  setText('permSub','Allow Hanji to check which of your contacts are already learning. We never store your contacts.');
+  S.permCallback=async()=>{
+    if('contacts' in navigator&&'ContactsManager' in window){
+      try{
+        const contacts=await navigator.contacts.select(['name','email'],{multiple:true});
+        showToast(`Checking ${contacts.length} contacts...`,'info');
+      }catch(e){showToast('Contacts not available on this device.','info');}
+    } else showToast('Contacts API not supported here. Use username search instead!','info');
+  };
+  eid('permOverlay').classList.add('open');
+}
+function allowPerm(){eid('permOverlay').classList.remove('open');S.permCallback?.();}
+function denyPerm(){eid('permOverlay').classList.remove('open');}
+
+function copyInvite(){
+  const link=eid('inviteLink')?.textContent||'';
+  navigator.clipboard?.writeText(link).then(()=>showToast('Link copied! 📋','success')).catch(()=>showToast('Copy: '+link,'info'));
+}
+function shareInvite(){
+  const link=eid('inviteLink')?.textContent||'';
+  if(navigator.share){navigator.share({title:'Join me on Hanji!',text:'Learn Chinese for HSK.',url:'https://'+link}).catch(()=>{});}
+  else copyInvite();
+}
+
+// ============================================================
+// PROFILE PAGE
+// ============================================================
+async function loadProfilePage(){
+  if(!S.user||!S.profile){openAuth('login');return;}
+  const p=S.profile;
+  const char=(p.full_name||p.username||'H')[0].toUpperCase();
+  const avEl=eid('profAvLg');
+  if(p.avatar_url){avEl.innerHTML=`<img src="${p.avatar_url}" alt="av"/><div class="prof-av-overlay">📷</div>`;}
+  else{avEl.innerHTML=`${char}<div class="prof-av-overlay">📷</div>`;}
+  setText('profName',p.full_name||p.username||'Learner');
+  setText('profEmail',p.email||S.user.email||'');
+  setText('profLev',`HSK ${p.hsk_level||1} Student`);
+  setText('profXP',(p.xp_points||0).toLocaleString());
+  setText('profStreak',p.daily_streak||0);
+  setText('profWords',p.total_words_learned||0);
+  eid('editName').value=p.full_name||'';
+  eid('editUsername').value=p.username||'';
+  eid('editBio').value=p.bio||'';
+  eid('editCountry').value=p.country||'';
+
+  // Show username change limit info
+  const now=new Date();
+  const thisMonth=`${now.getFullYear()}-${now.getMonth()}`;
+  const changeMonth=p.username_change_month;
+  const changesLeft=changeMonth===thisMonth?Math.max(0,2-(p.username_changes||0)):2;
+  const hint=eid('usernameHint');
+  if(hint){hint.textContent=`${t('usernameLimit')} (${changesLeft} remaining this month)`;hint.style.color=changesLeft===0?'var(--red)':'var(--ink3)';}
+  if(changesLeft===0)eid('editUsername').disabled=true;
+
+  // HSK scores
+  const scores=p.hsk_scores||{};
+  eid('hskScoresG').innerHTML=[1,2,3,4,5,6].map(lv=>{
+    const sc=scores[lv];const passed=sc>=180;
+    return `<div class="hsk-si ${sc?(passed?'passed':'failed'):''}">
+      <div class="hsk-si-lv">HSK ${lv}</div>
+      <div class="hsk-si-v">${sc||'—'}</div>
+      <div class="hsk-si-max">/300</div>
+      ${sc?`<div class="hsk-si-pass">${passed?'✓ Passed':'✗ Failed'}</div>`:''}
+    </div>`;}).join('');
+
+  // Profile goal
+  S.profGoal=p.daily_goal||10;
+  document.querySelectorAll('#profGoalOpts .goal-b').forEach(b=>b.classList.toggle('sel',parseInt(b.textContent)===S.profGoal));
+
+  // Super card
+  if(p.subscription_tier==='premium')eid('superCard').style.display='none';
+
+  // Following list
+  const following=p.following||[];
+  if(following.length){
+    const{data}=await sb.from('profiles').select('id,full_name,username,xp_points,avatar_url').in('id',following).limit(20);
+    eid('followingList').innerHTML=`<div class="follow-list">${(data||[]).map(u=>{
+      const av=u.avatar_url?`<img src="${u.avatar_url}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;" alt="av"/>` :`(u.full_name||u.username||'?')[0].toUpperCase()`;
+      return `<div class="fi" onclick="viewUserProf('${u.id}','${(u.full_name||u.username||'User').replace(/'/g,"\\'")}',${u.xp_points||0},0,0,'${u.avatar_url||''}')">
+        <div class="fi-av">${u.avatar_url?`<img src="${u.avatar_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"/>`:((u.full_name||u.username||'?')[0].toUpperCase())}</div>
+        <div class="fi-name">${u.username||u.full_name||'Learner'}</div>
+        <div class="fi-xp">${(u.xp_points||0)} XP</div>
+      </div>`;}).join('')}</div>`;
+  } else {
+    eid('followingList').innerHTML=`<div style="font-size:13px;color:var(--ink3)">${t('notFollowing')}</div>`;
+  }
+
+  // Badges
+  const earned=Array.isArray(p.badges)?p.badges:[];
+  eid('profBadges').innerHTML=ALL_BADGES.map(b=>{
+    const isE=earned.includes(b.id);
+    return `<div class="bch ${isE?'':'locked'}" title="${b.desc}"><span class="b-ico">${b.icon}</span><span class="b-name">${b.name}</span></div>`;
+  }).join('');
+
+  // Language button state
+  document.querySelectorAll('.lang-b').forEach(b=>{
+    const lmap={'🇬🇧 English':'en','🇷🇺 Русский':'ru','🇹🇲 Türkmen':'tk'};
+    b.classList.toggle('sel',lmap[b.textContent]===curLang);
+  });
+  applyLang();
+}
+
+function selProfGoal(n){
+  S.profGoal=n;
+  document.querySelectorAll('#profGoalOpts .goal-b').forEach(b=>b.classList.toggle('sel',parseInt(b.textContent)===n));
+}
+
+// Avatar change
+function changeAvatar(){eid('avatarInput')?.click();}
+async function uploadAvatar(input){
+  const file=input.files?.[0];if(!file||!S.user)return;
+  if(file.size>2*1024*1024){showToast('Image must be under 2MB.','error');return;}
+  const reader=new FileReader();
+  reader.onload=async(e)=>{
+    const dataUrl=e.target.result;
+    // Store as base64 in profile (for MVP — in production use Supabase Storage)
+    await upsertProfile(S.user.id,{avatar_url:dataUrl});
+    S.profile={...S.profile,avatar_url:dataUrl};
+    updateNav();
+    loadProfilePage();
+    showToast('Avatar updated! 📷','success');
+  };
+  reader.readAsDataURL(file);
+}
+
+// Save profile with username change tracking
+async function saveProf(){
+  if(!S.user)return;
+  setBL('saveProfBtn',true,'...');
+  const p=S.profile;
+  const now=new Date();
+  const thisMonth=`${now.getFullYear()}-${now.getMonth()}`;
+  const changeMonth=p.username_change_month;
+  const usernameChanges=changeMonth===thisMonth?(p.username_changes||0):0;
+  const newUsername=val('editUsername');
+  const updates={full_name:val('editName'),bio:val('editBio'),country:val('editCountry'),daily_goal:S.profGoal};
+
+  // Enforce username change limit (2 per month)
+  if(newUsername&&newUsername!==p.username){
+    if(usernameChanges>=2){
+      setBL('saveProfBtn',false,t('saveChanges'));
+      eid('profMsg').innerHTML=`<div class="alert alert-e">You can only change your username 2 times per month.</div>`;
+      setTimeout(()=>{eid('profMsg').innerHTML='';},3000);
+      return;
+    }
+    updates.username=newUsername;
+    updates.username_changes=usernameChanges+1;
+    updates.username_change_month=thisMonth;
+  }
+
+  await upsertProfile(S.user.id,updates);
+  S.profile={...S.profile,...updates};
+  setBL('saveProfBtn',false,t('saveChanges'));
+  updateNav();
+  eid('profMsg').innerHTML=`<div class="alert alert-s">Saved ✅</div>`;
+  setTimeout(()=>{eid('profMsg').innerHTML='';},2500);
+  loadProfilePage();
+  showToast('Profile saved ✅','success');
+}
+
+function setLang(lang,btn){
+  curLang=lang;localStorage.setItem('hanji-lang',lang);
+  document.querySelectorAll('.lang-b').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');applyLang();
+  showToast(lang==='ru'?'Язык изменён! 🇷🇺':lang==='tk'?'Dil üýtgedildi! 🇹🇲':'Language updated! 🇬🇧','success');
+}
+
+function openUpgrade(){eid('upgradeOverlay').classList.add('open');}
+function joinWaitlist(){showToast('You\'re on the waitlist! 🚀','success');eid('upgradeOverlay').classList.remove('open');}
+function showStreakInfo(){if(S.profile?.daily_streak>0)showToast(`🔥 ${S.profile.daily_streak}-day streak! Keep it going!`,'gold');}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function launchConfetti(){
+  const container=eid('confettiContainer');
+  const colors=['#c8392b','#c9920a','#2a7a50','#6d28d9','#1a6fb5','#e85d4a'];
+  for(let i=0;i<30;i++){
+    const piece=document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.left=Math.random()*100+'%';
+    piece.style.top='-10px';
+    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDelay=Math.random()*0.8+'s';
+    piece.style.animationDuration=(1+Math.random()*0.5)+'s';
+    container.appendChild(piece);
+    setTimeout(()=>piece.remove(),2000);
+  }
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function eid(id){return document.getElementById(id);}
+function val(id){return(eid(id)?.value||'').trim();}
+function setText(id,txt){const el=eid(id);if(el)el.textContent=txt;}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function showA(id,msg,cls='alert-e'){eid(id).innerHTML=`<div class="alert ${cls}">${msg}</div>`;}
+function setBL(id,l,tx){const b=eid(id);if(!b)return;b.disabled=l;b.innerHTML=l?`<span class="spin"></span> ${tx}`:tx;}
+let toastT;
+function showToast(msg,type='info'){
+  const t=eid('toast');t.textContent=msg;t.className=`show ${type}`;
+  clearTimeout(toastT);toastT=setTimeout(()=>{t.className='';},3500);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(async()=>{
+  applyLang();
+  const{data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    S.user=session.user;
+    S.profile=await initProfile(S.user);
+    if(S.profile){updateNav();eid('bot-nav').style.display='flex';showPage('dashboard');loadDashboard();}
+  }
+  sb.auth.onAuthStateChange(async(ev,ses)=>{
+    if(ev==='SIGNED_IN'&&ses){S.user=ses.user;if(!S.profile)S.profile=await initProfile(S.user);}
+    else if(ev==='SIGNED_OUT'){S.user=null;S.profile=null;}
+  });
+})();
+</script>
+</body>
+</html>
